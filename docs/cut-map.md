@@ -35,6 +35,19 @@ Later operator additions the same day:
 - invariant 8: "make sure we have analytic derivatives flowing down every
   level".
 
+Progress (Self keeps this current):
+- **Cut 2:** Hands landed it on CultLib `hands/asura-surface-nets`
+  (`29e50ad..659e3dd`, 6 commits, all building). Surface-nets tests pass.
+  Stryker (`--since`, which fell back to the whole glob on this first config)
+  left 20 survivors: in the cut's own files, one float-threshold flip and three
+  claimed vstest false survivors; the rest are in untouched files. Soul pass 1
+  running.
+  - Reported by Hands as pre-existing: 7 `GeometryDocumentTests` fail at
+    `29e50ad` (`CultGeometryBuildRequest.DomainKey` reference not walkable by
+    `CultDocumentRegistry.Refresh`). Soul is diagnosing the cause and owner.
+- **Cut 2a-i:** Hands running on CultLib `hands/cultmath-asura-noise` from
+  `29e50ad`.
+
 Answered 2026-09-25 (see target, "Rulings on the second map pass"):
 - Q10: independent 0.25 draws in zone-gen settings. Galaxy-driven variance is a
   later campaign.
