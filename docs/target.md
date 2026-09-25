@@ -126,7 +126,7 @@ row except the first is derived at load time and discarded on unload.
 | Surface-net quad | (planet, cell, axis) | Rebuilt from the grid on load, never persisted | CultLib surface nets |
 | Tile slot | quad id to slot index, in an allocation table | Allocated on load; promoted to a higher level near the dock site; freed on unload | Asura atlas allocator |
 | Tile contents (positions, normals, material) | the slot | Regenerable at any time from field and quad; overwritten on promotion | Asura tile pass. Forbidden writers: anything else |
-| Mesh edge (shared by two quads) | the unordered pair of base vertices | Carries the edge's refined points and its per-edge factor, stored once so both quads read the same memory | Asura tile pass; regenerable |
+| Mesh edge (shared by an even number of quads: 2 where the grid resolves the field, 4 or more where it doesn't) | the unordered pair of base vertices | Carries the edge's refined points and its per-edge factor, stored once so every quad on it reads the same memory | Asura tile pass; regenerable |
 | Dock site and station placement | Aetheria station identity | Authored | Aetheria. Asura only answers field queries |
 
 ## Scope boundary

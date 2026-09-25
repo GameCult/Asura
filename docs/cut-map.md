@@ -40,11 +40,28 @@ Progress (Self keeps this current):
   (`29e50ad..659e3dd`, 6 commits, all building). Surface-nets tests pass.
   Stryker (`--since`, which fell back to the whole glob on this first config)
   left 20 survivors: in the cut's own files, one float-threshold flip and three
-  claimed vstest false survivors; the rest are in untouched files. Soul pass 1
-  running.
+  claimed vstest false survivors; the rest are in untouched files.
   - Reported by Hands as pre-existing: 7 `GeometryDocumentTests` fail at
     `29e50ad` (`CultGeometryBuildRequest.DomainKey` reference not walkable by
     `CultDocumentRegistry.Refresh`). Soul is diagnosing the cause and owner.
+  - Soul pass 1 found real defects:
+    - F1: Stryker never mutated `Extract`, because unassigned locals turned all
+      98 mutants into compile errors.
+    - F4: orientation had two authorities, which split on degenerate quads.
+    - F3: the float guard made answers worse.
+    - F2: the survivor triage was wrong.
+    - F6, F7, F8: minor.
+
+    Fix batch 1 is out to a fresh Hands.
+  - The 7 `GeometryDocumentsTests` failures: CultLib `e420410` (CultNet
+    selection, cut 1, commit 0) added registry check D11, which refuses
+    `[CultReference]` on `string` members. Geometry has three of them
+    (`CultGeometryDocuments.cs:156, :231, :316`). The tests passed at `b3d9cf7`
+    and fail at `e420410`. **This blocks Cut 3**, because Unity consumers would
+    throw on registering Geometry documents. It is an operator question (Q13).
+  - Follow-ups outside Asura: `CultGeometryIsoSurface.cs:148` has the same
+    worse-than-exact float guard, and IsoSurface also accepts non-finite samples.
+    The GameCult.Geometry owner should mirror Cut 2's fixes there.
 - **Cut 2a-i:** Hands running on CultLib `hands/cultmath-asura-noise` from
   `29e50ad`.
 
@@ -142,6 +159,20 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
   same edge-keyed region carries the docked view's per-edge factor (Cut 7c).
   This is how invariant 5 is made impossible to violate rather than merely
   likely to hold.
+
+  **Edge use is even, not always 2** (Soul, Cut 2 pass 1). Where the grid
+  under-resolves the field, surface nets emits edges used by 4 quads, and it
+  does so on realistic terrain, not only checkerboards. Soul measured 12 on a
+  24³ blob at amplitude 1.2, 93 at amplitude 3.0, and 11 on a 64³
+  low-frequency field. The key is still the vertex pair, so all 4 quads read
+  the same edge memory and the surface stays watertight. Nothing may assume 2:
+  - no "the other quad" lookup;
+  - no manifold-only adjacency;
+  - no per-edge storage sized as quad-count × 2.
+
+  Cut 6b's watertightness proof must include an under-resolved noisy field with
+  4-use edges. Band limits (D9) reduce how often this happens but do not
+  guarantee it never does.
 - **D5. The atlas is per body.** A body's tile storage is one `GraphicsBuffer`
   sized from its quad count and N. Its "allocation table" is the identity: slot
   = the quad's index in the mesher's sorted output. It is freed by disposing the
