@@ -84,6 +84,13 @@ Progress (Self keeps this current):
     scratch worktrees named `wt` share one bare mirror across campaigns
     (`~/eureka-verify/repos/wt.git`, from 2026-09-23). Name mirrors by repo
     identity, not path.
+  - Brief defect, recurring (2 of 4 Hands passes on 2026-09-25): Hands started
+    Stryker with a background shell job, then ended its turn "waiting to be
+    woken", despite the brief's poll clause. Fix the template, not just the
+    instance: verification jobs must never run as background shell tasks.
+    Launch the job detached with a log, then poll that log in foreground
+    chunks until it exits. Proposed for the Eureka skill's Hands brief;
+    applied to Self's briefs from now on.
   - **Budget scar:** Hands ran to about 340k tokens against an estimate of
     ~150k. Split later CultMath cuts finer (e.g. one primitive family per
     Hands).
