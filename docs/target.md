@@ -62,7 +62,8 @@ planet definition (seed, radius, biome parameters)
    same parameterisation, same shader. So the surface is watertight wherever
    neighbouring quads use the same tile level.
 6. **Reproducible from the seed.** The same definition gives the same field, the
-   same quads and the same tiles, on any machine.
+   same quads and the same tiles: bitwise on one machine, and within tolerance
+   across machines (Q7; CultMath's parity is CPU-only).
 7. **Zone generation never builds geometry.** Zone gen writes planet definitions
    only. Asura builds a planet on demand, asynchronously, when it first needs to
    be seen, and the existing flat planet icon stands in until it's ready. Each
@@ -126,6 +127,51 @@ Out:
 Two separate campaigns are queued behind this one:
 - The flow field as the single owner of motion in Aetheria.
 - Microfauna species and resources in the slime-mold scene.
+
+### Rulings on the cut map's questions (2026-09-25)
+
+- **Q1:** Cuts 1 and 7 land on Aetheria `master` after fire-control merges.
+  Cuts 2–6 do not touch Aetheria.
+- **Q2:** delete `PlanetOutpost.prefab` and `ReconStationAlpha.{prefab,asset}`
+  with the plugin.
+- **Q3:** as recommended. Each planet gets a seed from a local generator that
+  never draws from the zone's random stream. Its archetype is chosen by seed
+  for now. Old saves with no seed fail loudly and regenerate, with no
+  compatibility path.
+- **Q4:** "We want to reproduce the solar system in exaggerated Aetheria scale,
+  so think icy and rocky bodies either with or without geological activity and
+  hydraulic erosion … depending on the planet type." Pointer:
+  https://blog.runevision.com/2026/03/fast-and-gorgeous-erosion-filter.html.
+  So there are no "biomes". A body is an **archetype**: material (rock | ice) ×
+  activity (dead | active), with hydraulic erosion switched on per body:
+  - rock, dead: accumulated craters (Moon, Mercury);
+  - rock, active: resurfaced volcanic plains, sparse craters (Io, Venus);
+  - ice, dead: cratered ice (Ganymede, Callisto);
+  - ice, active: cracked lineae, sparse craters (Europa, Enceladus);
+  - erosion (Mars, Earth-like), layered over any of these.
+
+  The erosion filter is per-point evaluable, needs no simulation, and runs on
+  the GPU. It becomes a term in the field, so erosion detail is available at
+  tile resolution too. It is MPL-2.0 (Rune Skovbo Johansen, after Clay John
+  2018 and Felix Westin 2023), so it is ported with attribution and a
+  provenance file. The source is written for planar heightfields; the sphere
+  adaptation is new design.
+  - Ownership split: Phacelle noise (cell-pivot stripe noise) and simplex noise
+    with analytic gradient are noise primitives and go in CultMath, with C#
+    twins. The erosion filter is terrain shaping and goes in Asura's HLSL
+    field. CultMath's tests deliberately keep erosion kernels out of it
+    (`HlslMirrorTests`: no `spherical_erosion`).
+  - Craters and ice cracks both use cellular noise, which also goes in
+    CultMath.
+- **Q5–Q9:** Self's recommendations stand as defaults; the operator did not
+  object.
+  - Q5: the field is unit-radius and the body transform scales it.
+  - Q6: the docked view is presentation only. The station stands on its parent
+    planet at a direction derived from its key. The flattened pad waits.
+  - Q7: invariant 6 now reads "bitwise on one machine; within tolerance across
+    machines".
+  - Q8: no asteroid belts in this campaign.
+  - Q9: Asura is MPL-2.0.
 
 ## Deferred paths
 
