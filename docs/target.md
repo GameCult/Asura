@@ -63,6 +63,13 @@ planet definition (seed, radius, biome parameters)
    neighbouring quads use the same tile level.
 6. **Reproducible from the seed.** The same definition gives the same field, the
    same quads and the same tiles, on any machine.
+7. **Zone generation never builds geometry.** Zone gen writes planet definitions
+   only. Asura builds a planet on demand, asynchronously, when it first needs to
+   be seen, and the existing flat planet icon stands in until it's ready. Each
+   planet's build is independent: no shared mutable state, so builds run in
+   parallel. This is the lesson of the Celestial Body plugin, which was abandoned
+   because it was too slow to run for many planets during every zone gen and
+   could not be parallelised.
 
 ## Canonical implementations and consumers
 
@@ -77,7 +84,7 @@ planet definition (seed, radius, biome parameters)
 - `GameCult.Geometry.Csg`'s `distance(p)` (landed `d84acb6`) serves future
   brush-built structures. Planets do not use it.
 - The third-party "Celestial Body" plugin in Aetheria is unused (no scene
-  instantiates it). It is prior art at most (pending fork F2).
+  instantiates it) and is to be deleted (ruling F2).
 - Aetheria's nebula field (`Volumetric.cginc`) is for later condensed bodies, not
   planets.
 
@@ -134,5 +141,11 @@ Two separate campaigns are queued behind this one:
   close-up. Stylised tiny-planet scale; big features shape the silhouette.
 - 2026-09-25: Surface nets, with subdivision and displacement restoring sharp
   features. Face-weighted normals for hard-surface edges.
-- Pending: F1 (field owner), F2 (Celestial Body plugin), F3 (planets generated
-  once from a seed).
+- 2026-09-25, F2: the Celestial Body plugin is deleted in its own subtraction
+  cut. It "was nice, but it was way too slow to generate a bunch of planets
+  during every zone gen, and I wasn't able to parallelize it, so I just let it
+  sit there." None of its code is harvested. Its shape ideas (craters, shattered
+  bodies, moats) may be rebuilt fresh as field functions.
+- Pending: F1 (field owner and where surface nets runs, now also a throughput
+  question), F3 (planets generated once from a seed), and the build budget (how
+  many planets per zone, how many visible at once).
