@@ -62,8 +62,15 @@ Progress (Self keeps this current):
   - Follow-ups outside Asura: `CultGeometryIsoSurface.cs:148` has the same
     worse-than-exact float guard, and IsoSurface also accepts non-finite samples.
     The GameCult.Geometry owner should mirror Cut 2's fixes there.
-- **Cut 2a-i:** Hands running on CultLib `hands/cultmath-asura-noise` from
-  `29e50ad`.
+- **Cut 2a-i:** Hands landed it on CultLib `hands/cultmath-asura-noise`
+  (`29e50ad..1add078`, 8 commits, all building).
+  - 184 of 184 CultMath tests pass. FXC `cs_5_0` compiles a kernel using both
+    new functions. dxc was not run: the tool is missing on Starfire.
+  - Soul pass 1 is running. Suspects: the tolerance change in `08b0dce`, the
+    deleted F2 guard, and whether a 3×3×3 search is complete for F2.
+  - **Budget scar:** Hands ran to about 340k tokens against an estimate of
+    ~150k. Split later CultMath cuts finer (e.g. one primitive family per
+    Hands).
 
 Answered 2026-09-25 (see target, "Rulings on the second map pass"):
 - Q10: independent 0.25 draws in zone-gen settings. Galaxy-driven variance is a
