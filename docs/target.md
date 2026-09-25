@@ -81,6 +81,15 @@ planet definition (seed, archetype parameters)
    Newton refinement, normals, crease detection, and the erosion input. Every
    term is checked against central finite differences away from its known
    creases.
+   - **One bounded exception (Q12 = A):** the erosion filter's gradient is the
+     upstream analytic form, which is inexact by construction. Its flow and masks
+     depend on the base slope, so an exact first derivative would need second
+     derivatives of every term. It is checked against a committed regression
+     bound on its measured angular error, not the tight tolerance, and every
+     other term stays exact. The field value, and so the silhouette, is exact
+     regardless.
+   - **Band limits (Q11):** a lowering may band-limit the field to what its
+     sample spacing can resolve, and never otherwise alters it.
 
 ## Canonical implementations and consumers
 
@@ -188,6 +197,20 @@ Two separate campaigns are queued behind this one:
     machines".
   - Q8: no asteroid belts in this campaign.
   - Q9: Asura is MPL-2.0.
+
+### Rulings on the second map pass (2026-09-25)
+
+- **Q10:** "keep it simple for now, as per suggestion". The erosion and aeolian
+  switches are independent draws at 0.25 each, over any archetype, stored in
+  zone-gen settings.
+  - Follow-up, for a later campaign: "ideally the variance will be driven by the
+    galaxy." The operator recalls galaxy-level noise fields representing
+    resource distributions. Those fields, or their successor, should pick each
+    body's archetype and switches, which makes the galaxy the owner of "what
+    planet is here". Locate them before designing it.
+- **Q11:** accepted as worded; recorded under invariant 8.
+- **Q12:** A. The erosion term's upstream derivative is accepted with a committed
+  error bound. There are no second derivatives in this campaign.
 
 ## Deferred paths
 

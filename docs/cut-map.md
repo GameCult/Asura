@@ -35,11 +35,15 @@ Later operator additions the same day:
 - invariant 8: "make sure we have analytic derivatives flowing down every
   level".
 
-Open: new questions Q10–Q12 at the end. None blocks Cuts 2a, 3, 4a, 4b-i or
-4b-ii.
-- Q10 blocks 7a's archetype draw.
-- Q11 is a target wording amendment for Self.
-- Q12 (erosion under invariant 8) blocks 4b-iii.
+Answered 2026-09-25 (see target, "Rulings on the second map pass"):
+- Q10: independent 0.25 draws in zone-gen settings. Galaxy-driven variance is a
+  later campaign.
+- Q11: the band-limit wording is accepted and is in target invariant 8.
+- Q12: A. Erosion keeps upstream's analytic derivative, checked against a
+  committed error bound. There are no second derivatives this campaign.
+
+Nothing is open. Cuts 1 and 7 wait on fire-control merging to Aetheria master.
+The Q10–Q12 texts at the end are kept as history; these answers supersede them.
 
 ## Cut order
 
