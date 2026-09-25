@@ -1,6 +1,7 @@
 # Asura: cut map
 
-Status: cut map, Imagination pass 1, 2026-09-25. Nothing here has landed.
+Status: cut map, Imagination pass 2, 2026-09-25. Cut 2 is being executed by
+Hands in `F:\Projects\CultLib-asura-surface-nets`. Nothing has landed yet.
 `docs/target.md` owns the ends. This document owns the means. Where this map and
 the Body disagree, the Body wins and this map is stale. The map lives on `main`
 of `GameCult/Asura`.
@@ -9,39 +10,71 @@ Pinned HEADs (every `file:line` below is against these):
 
 | Repo | Ref | SHA | Note |
 | --- | --- | --- | --- |
-| Asura | `main` | `54a748a` | target with the one-tile-mode and crease-snapping rulings |
+| Asura | `main` | `5f0f6bd` | target with the rulings on Q1–Q9, archetypes, the erosion filter and invariant 8 |
 | CultLib | `origin/main` | `29e50ad` | Local `main` in `F:\Projects\CultLib` is 15 commits behind (`d110d9d`). The main checkout sits on `hands/cultmath-erf`. Work from `origin/main` in a worktree. |
 | CultLib tags | `cultmath-unity-v0.2.4` / `cultlib-unity-v1.0.60` | `6d5e209` / `45c2f40` | both are ancestors of `29e50ad` |
 | Aetheria | `origin/master` | `9b85211f` | mainline, 2026-09-17; pins `cultlib-unity-v1.0.59` and `cultmath-unity-v0.2.3` |
 | Aetheria | `origin/codex/fire-control-12` | `ab14552a` | In flight: 218 commits ahead of master and 2 ahead of the local checkout (`14ee2a52`). It pins cultlib `1.0.60`, cultmath `0.2.4` and caching `1.4.0`. **Do not touch `F:\Projects\Aetheria`'s tree.** |
 
-Rulings: the target's dated rulings, through the 2026-09-25 crease-snapping
-ruling. Nothing further yet.
+Rulings: the target's dated rulings, including "Rulings on the cut map's
+questions (2026-09-25)". Summary:
+- Q1: Aetheria cuts go on master, after fire-control merges.
+- Q2: delete the outpost and recon assets.
+- Q3: seed from a local generator, archetype by seed, no compatibility path.
+- Q4: bodies are archetypes, material (rock | ice) × activity (dead | active),
+  with hydraulic erosion switched on per body, using Johansen's erosion filter.
+  Phacelle noise and simplex noise with an analytic gradient go in CultMath;
+  the filter goes in Asura.
+- Q5–Q9: as recommended.
 
-Open: operator questions Q1–Q9 at the end. Q1 blocks Cuts 1 and 7. Q3, Q5 and Q6
-block Cut 7. Q4 blocks Cut 2a's scope.
+The answered questions are recorded under "Operator questions".
+
+Later operator additions the same day:
+- aeolian dunes: "1-abs(snoise(p)) gives nice dune contours", used "to push the
+  terrain really far at really low frequency to influence the silhouette";
+- invariant 8: "make sure we have analytic derivatives flowing down every
+  level".
+
+Open: new questions Q10–Q12 at the end. None blocks Cuts 2a, 3, 4a, 4b-i or
+4b-ii.
+- Q10 blocks 7a's archetype draw.
+- Q11 is a target wording amendment for Self.
+- Q12 (erosion under invariant 8) blocks 4b-iii.
 
 ## Cut order
 
 ```text
-2a CultMath gaps ─┐
-2  surface nets ──┴─> 3 CultLib Unity release ─> 4a Asura skeleton ─> 4b field + sampling
-                                                   ─> 5a mesh + bare render ─> 5b benchmark
-                                                   ─> 6a tile pass ─> 6b patch render + watertight ─> 6c crease snap
-                                                   ─> R Asura release tag
-1 delete plugin (Aetheria; any time after Q1) ─────────────────────────> 7a defs ─> 7b integration ─> 7c docked view
+2a-i CultMath basics ─> 2a-ii gradient noise + Phacelle ─> cultmath 0.3.0 ─┐
+2    surface nets (in flight) ──────────────────────────────────────────────┴─> 3 CultLib Unity release
+  ─> 4a Asura skeleton ─> 4b-i field + sampling + Moon ─> 4b-ii lineae, dunes, plains ─> 4b-iii erosion (after Q12)
+  ─> 5a mesh + bare render ─> 5b benchmark
+  ─> 6a tile pass ─> 6b patch render + watertight ─> 6c crease snap
+  ─> R Asura release tag
+1 delete plugin (Aetheria master, after fire-control merges) ─> 7a defs ─> 7b integration ─> 7c docked view
 ```
 
+4b-ii and 4b-iii can run beside 5a in separate worktrees. 5a needs only 4b-i's
+grids, and the later terms are more terms in the same field.
+
 Re-splits from the brief, with reasons:
-- **2a is new.** CultMath has no fBm, no smooth-min and no cellular noise. The
-  HLSL function list at `29e50ad` is catmullrom, clamp, csum, the béziers, damp,
-  decay, degrees, distance, frac, hash, lengthsq, lerp, pcg/pcg3d/pcg4d, reflect,
-  rotate, saturate, the smoothsteps, snoise, step and value_noise*. The target
-  needs fBm for its noise and smooth-min for its bevels and pads. Gaps are filled
-  in the owner, and 2a releases before Cut 3, because Cut 3's Geometry DLL is
-  compiled against the CultMath version it ships beside (see Cut 3).
+- **2a is split in two**, 2a-i and 2a-ii, with one release at the end. After
+  Q4, 2a carries five primitives, and they no longer fit one Hands pass. See
+  2a for the reasons.
+  - CultMath has no fBm, smooth-min, cellular noise, gradient noise or Phacelle
+    noise. The HLSL function list at `29e50ad` is catmullrom, clamp, csum, the
+    béziers, damp, decay, degrees, distance, frac, hash, lengthsq, lerp,
+    pcg/pcg3d/pcg4d, reflect, rotate, saturate, the smoothsteps, snoise, step and
+    value_noise*.
+  - Gaps are filled in the owner.
+  - 2a releases before Cut 3, because Cut 3's Geometry DLL is compiled against
+    the CultMath version it ships beside (see Cut 3).
 - **Cut 4 is split** into the skeleton (package, host project, headless Core
-  tests) and the GPU work. Each part alone is roughly 150–200k tokens.
+  tests) and the GPU work. The GPU work is split three ways:
+  - 4b-i: plumbing and the first archetype;
+  - 4b-ii: the remaining terms;
+  - 4b-iii: the erosion port with its sphere adaptation.
+
+  Each part is roughly 150–200k tokens.
 - **Cut 5 is split** into the build path and the benchmark. The benchmark has
   its own harness and its own committed artefact.
 - **Cut 6 is split three ways**, as the operator asked: the compute pass,
@@ -50,7 +83,8 @@ Re-splits from the brief, with reasons:
   Soul pass before it is pushed (SKILL.md step 5).
 - **Cut 7 is split** into definitions (headless, mutation-reachable), then
   render integration, then the docked view.
-- **Cut 1** runs whenever Q1 is settled. Nothing in Cuts 2–6 depends on it.
+- **Cut 1** runs on Aetheria master once fire-control has merged (Q1). Nothing in
+  Cuts 2–6 depends on it.
 
 ## Standing design decisions (means, not operator forks)
 
@@ -74,7 +108,9 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
   not the rule the operator ruled.
 - **D3. The field is unit-radius in body-local space.** Asura's mesh is a child
   of Aetheria's `Body` transform, which already carries `localScale = BodyRadius`
-  (`ZoneRenderer.cs:406` at master). This depends on the Q5 answer.
+  (`ZoneRenderer.cs:406` at master). Q5 ruled for this on 2026-09-25. The field
+  is `f(p) = |p| − (1 + h(p/|p|))`, where `h` is a height over the unit sphere.
+  Inside is `f <= 0`.
 - **D4. Patch points are stored once per shared element.** A body's tile data
   is three regions, each keyed by the thing it belongs to:
   - one refined point per base vertex;
@@ -105,6 +141,39 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
 - **D7. Unity tests run in a host project inside the Asura repo**
   (`unity/AsuraHost/`), following CultLib's own `src/GameCult.Unity` host
   project. Aetheria's tree stays out of the loop until Cut 7.
+- **D8. Analytic derivatives at every level (target invariant 8).** The
+  operator, 2026-09-25: "make sure we have analytic derivatives flowing down
+  every level." `asura_field(p, body, band) → float4(∇f.xyz, f.w)`.
+  - Every term and every CultMath primitive under it returns value and gradient
+    together, in the same layout, and composition uses the chain rule.
+  - The sphere composition is `∇f = u − (I − uuᵀ)∇h/|p|`, with `u = p/|p|`.
+    **This is the highest-risk site for a quiet error:** a sign, a dropped
+    projection, or a missing `1/|p|`. 4b-i tests it off the unit sphere.
+  - There are **no finite differences anywhere in the field or its
+    consumers.** Sampling, Newton refinement, tile normals, crease detection,
+    the erosion input and the dock query all read the one analytic gradient.
+  - One evaluation per point then serves everything. Central differences would
+    have cost 4–7 per point.
+  - Finite differences exist only in tests, as the property-test oracle.
+  - The one term that cannot meet a finite-difference tolerance is erosion
+    (probe: 4b-iii). Q12 puts that fork to the operator.
+  - Second derivatives (the erosion article's curvature feature) are out of this
+    campaign; record them.
+- **D9. Every multi-octave term is band-limited by the caller's footprint.**
+  The consumer passes its sample spacing:
+  - the grid cell size for sampling;
+  - the patch spacing (base cell ÷ N) for tiles;
+  - a fixed small footprint for the dock query.
+
+  Octaves above Nyquist for that spacing are dropped, and the last kept octave
+  is faded. This applies to fBm, ridged dunes, crater scales, lineae scales and
+  erosion octaves. Without it, the coarse grid aliases erosion gullies and dune
+  crests into topological noise in the surface-net mesh. The full field is the
+  footprint → 0 limit. Each lowering evaluates the same function, band-limited to
+  what it can resolve, so tile refinement adds exactly the detail the grid could
+  not hold. Watertightness is unaffected: D4 stores shared points once, and a
+  body's patch spacing is uniform except in 7c, where edges carry their own
+  factor. Target amendment for Self: Q11.
 
 ## Verification hosts (applies to every cut)
 
@@ -143,9 +212,11 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
 
 ### Cut 1. Aetheria: delete the Celestial Body plugin (subtraction only)
 
-- **Repo/branch:** Aetheria, `hands/asura-cut1`, based per Q1: master
-  `9b85211f`, or the merged fire-control line. Anchors are given for both; the
-  plugin's own files are identical between master and `ab14552a`.
+- **Repo/branch:** Aetheria, `hands/asura-cut1`, from `master` **after the
+  fire-control line has merged** (Q1, 2026-09-25). Before dispatch, Self re-pins
+  master's HEAD and re-checks the anchors below. They are given for master
+  `9b85211f` and for `ab14552a`, because post-merge master will carry
+  `ab14552a`'s lines. The plugin's own files are identical in both.
 - **First:**
   - A worktree. **Never** `F:\Projects\Aetheria` itself.
   - The worktree needs LFS objects for the files it edits, because `*.asset` is
@@ -186,8 +257,9 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     - the enabled `LODHandler` component `--- !u!114 &1009503736` (`:16782-16795`);
     - its `- component:` entry on GameObject `&1009503727`;
     - ZoneRenderer's `LODHandler: {fileID: 1009503736}` at `:16721`.
-  - **Per Q2:** `Assets/Resources/Prefabs/Stations/PlanetOutpost.prefab` (+meta)
-    and `Assets/Resources/Locations/ReconStationAlpha.{prefab,asset}` (+metas).
+  - **Q2, ruled delete (2026-09-25):**
+    `Assets/Resources/Prefabs/Stations/PlanetOutpost.prefab` (+meta) and
+    `Assets/Resources/Locations/ReconStationAlpha.{prefab,asset}` (+metas).
     What they reference:
     - `PlanetOutpost.prefab:322-332` has an **enabled** `CelestialBodyGenerator`
       whose `body` is `ReconStationAlpha.asset`, and `:225` uses the plugin's
@@ -214,11 +286,12 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     `-nographics` is allowed here) with zero compile errors. Also an
     `Aetheria.Shared` headless build on Yggdrasil. It is unaffected, but it
     proves ServerShared never touched the plugin.
-  - catalog: on the fire-control line, `EngineAssetCheck.Run` in batchmode
-    (`docs/addressables-cut.md:220`) exits 0 after the delete. On master, a
-    scratch decode of `GameData/Aetheria.cc` through AetherDb's cache-open path
-    must find 0 string fields containing `PlanetOutpost`, `ReconStationAlpha` or
-    `Celestial Body`, and print the count of strings scanned. The probe stays
+  - catalog: `EngineAssetCheck.Run` in batchmode exits 0 after the delete. It
+    arrives with fire-control (`docs/addressables-cut.md:220` on `ab14552a`). If
+    post-merge master somehow lacks it, fall back to a scratch decode of
+    `GameData/Aetheria.cc` through AetherDb's cache-open path. That decode must
+    find 0 string fields containing `PlanetOutpost`, `ReconStationAlpha` or
+    `Celestial Body`, and print the count of strings scanned; the probe stays
     scratch.
   - negative, verified against master today:
     - `rg -n -i "celestial" Assets ProjectSettings Packages -g "!*.md"` → 0. It
@@ -237,55 +310,175 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     stand-in sphere with no missing-script warnings in the console.
 - **Rules that lose a test:** none. The plugin had no tests.
 - **Ledger estimate:** −310 files, −11,344 text lines, −16 LFS binaries,
-  −~15 C# lines, −~45 YAML lines. Add −2 prefabs and −1 asset if Q2 is A.
+  −~15 C# lines, −~45 YAML lines, −2 prefabs and −1 asset (Q2).
 - **Hands budget:** ~120k tokens.
 - **Doc sweep for Self:** `docs/settings-globals-cut.md` fork B (`:527-535`),
   which moves the 7 body-settings assets into `Resources`, is superseded by F2.
   Mark it history in that map the day this cut lands.
 
-### Cut 2a. CultMath: fBm, smooth-min (and cellular noise per Q4)
+### Cut 2a. CultMath: the noise primitives Asura's field needs (2a-i, 2a-ii)
 
 - **Repo/branch:** CultLib, `hands/cultmath-asura-noise`, from `origin/main`
-  `29e50ad`, in its own worktree. Release `cultmath-unity-v0.3.0`: additive, so a
-  minor bump per `docs/semver-policy.md`. The release belongs to this cut and
-  gets a Soul pass before the tag.
-- **Adds,** each in C# `math` (`packages/cultmath/src/CultMath/math.cs`, near
-  `snoise` at `:594`) and in `shaders/CultMath.hlsl` with the same name prefixed
-  `cultmath_`:
-  - `fbm(float3 p, int octaves, float lacunarity, float gain)`: the octave sum of
-    `snoise(float3)`.
-  - `smin(float a, float b, float k)`: polynomial smooth minimum. It feeds the
-    target's brush-seam bevels and the dock pad blend.
-  - Per Q4 = A: `cellular(float3 p)`, returning the nearest-feature distance, and
-    `cellular_id` or an out parameter for the feature cell id. It is built on
-    `pcg3d`. It is needed for craters.
+  `29e50ad`, in its own worktree. Do not use Cut 2's
+  `F:\Projects\CultLib-asura-surface-nets`. 2a-ii continues on the same branch
+  after 2a-i lands. One release, `cultmath-unity-v0.3.0`, at the end of 2a-ii:
+  it is additive, so a minor bump per `docs/semver-policy.md`, and it gets a Soul
+  pass before the tag. There is one release rather than two because every
+  CultMath release forces a matching `org.gamecult.cultlib` release (Cut 3's
+  coupling rule).
+- **Common rules for every addition:**
+  - It lives in C# `math` (`packages/cultmath/src/CultMath/math.cs`, near
+    `snoise` at `:594`) and in `shaders/CultMath.hlsl`, with the same name
+    prefixed `cultmath_`.
+  - Both tracked `CultMath.hlsl` copies stay the same blob (`6179d45` today).
+  - Bodies stay inside the transformation list at
+    `packages/cultmath/docs/design.md:92`.
+  - **Invariant 8 (operator, 2026-09-25: "make sure we have analytic
+    derivatives flowing down every level").** Every new primitive returns its
+    value and its analytic gradient together, laid out as
+    `float4(∇.xyz, value.w)`:
+    - `r.xyz` is directly the gradient as a `float3`, and `r.w` is the value;
+    - this is the same layout for every primitive;
+    - new primitives have **only** this form. A value-only twin would be a
+      second path with no consumer, since the value is `.w`;
+    - the existing value-only `snoise(float3)` and `snoise(float2)` stay, because
+      they are public API and removing them is a semver major.
+  - Two primitives yield more than one value and gradient: cellular (the F1 and
+    the edge distances, plus the nearest cell id) and Phacelle (cos and sin, each
+    with a gradient). They return a small CultMath struct instead of recomputing
+    the neighbourhood search per output: `CultCellular` and `CultPhasor`.
+    - Today the mirror comparison reflects over C# counterparts with matching
+      parameter types, and compares only scalar and vector returns.
+    - So 2a-i extends `design.md`'s transformation list (`:92`) and
+      `HlslSourceCompatibilityTests` to allow one struct return shape, compared
+      field by field and bit for bit.
+    - That extension happens once, in the owner, with its own test: a struct
+      mirror whose field differs must fail.
+  - Cell selection hashes with `pcg3d`, which is integer-exact on CPU and GPU
+    (`design.md`, "Integer hashing"). Nothing new uses the `sin`-based `hash`.
+  - Names must not contain `spherical_erosion` or pull in
+    `AdvancedErosionFilter.hlsl`. `HlslMirrorTests.cs:7-15` forbids erosion
+    kernels in CultMath, and that ruling stands: the erosion filter is Asura's
+    (4b-ii).
+  - `THIRD-PARTY-NOTICES.md` (both the `packages/cultmath` and the unity package
+    copies) gains an entry for every ported primitive.
 
-  Mirror bodies must stay inside the transformations listed in
-  `packages/cultmath/docs/design.md:92`.
-- **Keeps:** everything. Both tracked copies of `CultMath.hlsl`
-  (`packages/cultmath/shaders/` and
-  `packages/cultmath/unity/org.gamecult.cultmath/Shaders/`) are the same blob
-  (`6179d45`) and must stay identical. The existing package script already
-  enforces this.
-- **Verification (Yggdrasil):**
-  - `HlslSourceCompatibilityTests.EveryMirrorFunctionMatchesCSharpMath`
-    automatically compares every `cultmath_*` mirror with a C# counterpart bit
-    for bit. A new mirror with no C# twin fails `Assert.Contains(... MirrorOnly)`.
-  - Behavioural tests:
-    - `fbm` with 1 octave equals `snoise`;
-    - gain and lacunarity act per octave;
-    - `smin(a,b,k) ≤ min(a,b)`, and it equals `min` when `|a−b| ≥ k`;
-    - `cellular` distance is ≥ 0 and zero at a feature point, and the id is
-      constant within a cell.
-  - Stryker, `-t mtp --since:29e50ad`, from `packages/cultmath/tests/CultMath.Tests`
-    (xunit.v3 needs `mtp`, per `docs/mutation-testing.md`). Triage every survivor.
-  - Starfire: FXC `cs_5_0` compile of a kernel calling each new mirror function.
-    This is the probe above, extended; FXC is Unity's D3D11 compiler.
-- **Rules that must die:** octave count honoured; gain applied multiplicatively
-  per octave; `smin`'s blend region bounded by `k`; `cellular` is the nearest
-  feature, not the first one found.
-- **Ledger estimate:** +~90 C#, +~70 HLSL, +~150 test lines.
-- **Hands budget:** ~150k tokens, including the release.
+#### 2a-i. Smooth-min, cellular, and the mirror-test struct extension
+
+- **Adds:**
+  - `smin_grad(float4 a, float4 b, float k) → float4`: polynomial smooth
+    minimum of two value-and-gradient forms. The output gradient is the blended
+    gradient, `lerp(∇b, ∇a, h)` with the same blend factor `h` as the value. It
+    serves the target's bevels, the pad blend, crater rims and flood plains.
+  - `cellular(float3 p) → CultCellular { float4 nearest; float4 edge; float id; }`:
+    - `nearest = (∇F1, F1)`, with `∇F1 = (p − c1)/F1`, the unit vector from the
+      nearest feature;
+    - `edge = (∇F2 − ∇F1, F2 − F1)`, for lineae along cell borders;
+    - `id` is the nearest cell's `pcg3d` hash mapped to [0,1), for per-crater
+      size, depth and presence;
+    - the search is over the 3×3×3 neighbourhood of jittered feature points.
+
+  fBm moves to 2a-ii, because its value-and-gradient form needs `snoise_grad`.
+
+  Cellular noise follows Worley 1996 ("A Cellular Texture Basis Function",
+  SIGGRAPH), implemented fresh. webgl-noise's `cellular3D.glsl` (MIT) returns
+  only F1 and F2 with no feature vectors, so it cannot serve the gradients.
+- **Rules that must die:**
+  - `smin` value `≤ min(a,b)`, and it equals `min` (with that input's gradient)
+    when `|a−b| ≥ k`.
+  - `F1 ≤ F2`. F1 is the *nearest* feature, not the first found: use a fixture
+    where the nearest lies in the last-visited cell.
+  - **Invariant 8 property test:** every gradient matches central differences
+    of its own `.w` within tolerance, at seeded random points, excluding a band
+    around the F1 = F2 set (cellular borders).
+  - The ids are constant within a feature's region.
+- **Hands budget:** ~150k tokens.
+
+#### 2a-ii. Simplex noise with analytic gradient, fBm, ridged noise, Phacelle
+
+- **Adds:**
+  - `snoise_grad(float3 p) → float4(∇n, n)`, ported from webgl-noise
+    `src/noise3Dgrad.glsl` (Ashima Arts / McEwan, MIT, confirmed in
+    `stegu/webgl-noise` today). It is the same noise family as the existing
+    `snoise` (the same Ashima source, `CultMath.hlsl:82-84`), so the existing
+    notice entry extends.
+  - `fbm_grad(float3 p, int octaves, float lacunarity, float gain) → float4`:
+    the octave sum of `snoise_grad`, with each octave's gradient scaled by its
+    frequency.
+  - `ridged_grad(float3 p, int octaves, float lacunarity, float gain) → float4`:
+    `Σ aᵢ(1 − |nᵢ|)` with gradient `−Σ aᵢ fᵢ sign(nᵢ)∇nᵢ`. This is the operator's
+    dune term ("1-abs(snoise(p)) gives nice dune contours", 2026-09-25). The
+    crease at `nᵢ = 0` is real and deliberate. Ridged multifractal noise is
+    standard (Musgrave, *Texturing and Modeling*, ch. 16) and is a noise
+    primitive, not terrain shaping, so it belongs here.
+  - `phacelle(float3 p, float3 side, float offset, float normalization) →
+    CultPhasor { float4 cos; float4 sin; }`, each as `(∇.xyz, value.w)`:
+    Johansen's Phacelle noise, generalised to 3D cells. The
+    caller supplies `side`, the stripe's wave vector (upstream builds it as
+    `perp(dir)·freq·τ`). In 3D the perpendicular is not unique, so choosing it
+    belongs to the caller: on a sphere it is `cross(p̂, flow)`.
+    - It visits 4×4×4 cells with jitter ±0.5 in each axis.
+    - The weight is `max(0, exp(−2d²) − 0.01111)`, as upstream.
+    - The output is normalised as upstream.
+    - **The gradient is exact:** it includes the weight derivatives
+      `∇w = −4v·exp(−2|v|²)` and the normalisation (`(I − ĉĉᵀ)∇P/|P|` above the
+      threshold, `∇P/(1−normalization)` below it). Upstream's convention,
+      `∇cos ≈ −sin·side`, ignores the weight gradient. The probe measured it
+      against central differences: 16.8° off at the median and 97.8° at the 95th
+      percentile. The exact form is 0.00° at the median and 0.03° at the 95th
+      percentile. Invariant 8 therefore rules out upstream's shortcut here.
+    - **Exact pruning:** skip any cell whose per-axis lower bound
+      `Σ max(0, |pf − g| − 0.5)² ≥ 2.25`, because its weight is exactly 0 there
+      (`exp(−4.5) = 0.011109 < 0.01111`). The pruned sum is bit-identical, and a
+      test pins that. The probe measured 14.0 of 64 cells non-zero on average.
+    - The provenance entry cites Rune Skovbo Johansen, Phacelle Noise, MPL-2.0
+      (Shadertoy `t3dyWl`; erosion filter `wXcfWn`; blog, March 2026). CultMath's
+      Unity package is MPL-2.0, so the licence is compatible. It also records
+      that the 3D-cell generalisation and the caller-supplied side vector are
+      new.
+    - **No 2D variant.** Nothing consumes one. Add it when a consumer appears.
+- **Phacelle is a primitive, not erosion code.** The evidence:
+  - The function's parameters are point, direction, frequency, phase offset and
+    normalisation. None of them is an erosion concept.
+  - The upstream doc comment calls it "The Simple Phacelle Noise function
+    produces a stripe pattern aligned with the input vector"
+    (`lpmitchell/AdvancedTerrainErosion`, `AdvancedTerrainErosion.cs:423-449`,
+    marked MPL-2.0, © 2025 Johansen).
+  - The article calls it general-purpose, and it has its own standalone
+    Shadertoy (`t3dyWl`).
+  - The erosion-specific parts are the octave loop, masks, fade target and gully
+    slope. They are 4b-ii's and stay in Asura.
+- **Rules that must die:**
+  - `snoise_grad.w` equals `snoise` within 1e-6 (report whether it is
+    bit-equal).
+  - fBm with 1 octave equals `snoise_grad`; gain and lacunarity act per octave.
+  - **Invariant 8 property test:** for `snoise_grad`, `fbm_grad`, `ridged_grad`
+    and both `phacelle` phasor components, the gradient matches central
+    differences of `.w` at seeded random points. Exclusion bands:
+    - `ridged_grad` excludes a band around `nᵢ = 0`, where the crease is real;
+    - `phacelle` excludes a band around the normalisation threshold.
+
+    A `ridged_grad` fixture straddling a zero crossing also pins that the two
+    one-sided gradients differ in sign.
+  - Phacelle:
+    - output magnitude is 1 where the raw magnitude is ≥ 1 − normalization;
+    - **stripes run along the flow**: with `side = cross(p̂, flow)` on the unit
+      sphere, `mean|∂cos/∂flow| / mean|∂cos/∂side| ≤ 0.25`. The probe measured
+      0.212, against 0.202 for the planar upstream function;
+    - continuity: the max step difference shrinks tenfold per tenfold step;
+    - pruned output is bit-equal to unpruned.
+- **Verification (both parts, Yggdrasil):**
+  - `dotnet test` from `packages/cultmath/tests/CultMath.Tests`.
+    `HlslSourceCompatibilityTests.EveryMirrorFunctionMatchesCSharpMath`
+    automatically compares every new mirror with its C# twin bit for bit; a
+    mirror without a twin fails `Assert.Contains(... MirrorOnly)`.
+  - Stryker `-t mtp --since:<part base>` (xunit.v3). Triage every survivor.
+  - Starfire: FXC `cs_5_0` compile of a kernel calling each new function. This
+    extends this map's FXC probe, and FXC is Unity's D3D11 compiler.
+  - Also `dxc -T lib_6_3 -HV 2021` per `design.md`.
+- **Hands budget:** ~200k tokens, including the release.
+- **Ledger estimate (2a total):** +~250 C#, +~220 HLSL, +~350 test lines, and 2
+  notice entries.
 
 ### Cut 2. CultLib: surface nets and face-weighted normals in GameCult.Geometry
 
@@ -475,8 +668,8 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
 
 ### Cut 4a. Asura: Unity package skeleton, host project, headless Core
 
-- **Repo/branch:** Asura `main` `54a748a`. Hands commits code; Self commits the
-  map.
+- **Repo/branch:** Asura `main` (re-pin at dispatch; `5f0f6bd` today). Hands
+  commits code; Self commits the map.
 - **Adds:**
   ```text
   unity/org.gamecult.asura/
@@ -484,13 +677,15 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
                                   "dependencies": UPM package.json cannot declare
                                   git deps, so README states the required
                                   cultlib/cultmath tags
-    README.md, CHANGELOG.md, LICENSE.md (match CultMath's MPL-2.0 unless the operator says otherwise)
+    README.md, CHANGELOG.md, LICENSE.md (MPL-2.0, Q9)
     Runtime/Core/GameCult.Asura.Core.asmdef      noEngineReferences: true;
                                   precompiledReferences GameCult.Geometry.dll, CultMath.dll
-    Runtime/Core/*.cs             AsuraBodyDefinition (Seed, Biome; no radius, D3/Q5),
-                                  AsuraBiome (enum: Dunes, Craters|Rugged per Q4,
-                                  plus analytic kinds Sphere, Box, CraterRim, Plane
-                                  used as fixtures and as a legit baseline)
+    Runtime/Core/*.cs             AsuraBodyDefinition { uint Seed; AsuraMaterial Material
+                                  (Rock|Ice); bool Active; bool Eroded; bool Aeolian }
+                                  (no radius: D3/Q5), and AsuraFieldKind { Planet, Sphere,
+                                  Box, CraterRim, Plane, DuneCrest }. The analytic kinds
+                                  are fixtures and a legit baseline, and they go through
+                                  the same kernels as Planet (one rule, one path).
     Runtime/GameCult.Asura.asmdef references Core, CultMath.UnityBridge; engine refs
     Runtime/Shaders/              (empty until 4b)
     Tests/Editor/GameCult.Asura.Tests.Editor.asmdef   testables via host
@@ -501,20 +696,24 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     ProjectSettings/*             minimal; Library/, Temp/, Logs/, UserSettings/ git-ignored
   tests/Asura.Core.Tests/
     Asura.Core.Tests.csproj       net10.0; <Compile Include="../../unity/org.gamecult.asura/Runtime/Core/**/*.cs"/>;
-                                  ProjectReference to CultLib GameCult.Geometry via a
+                                  ProjectReference to CultLib GameCult.Geometry and CultMath via a
                                   CultLibRoot sibling property (Aetheria.Shared's pattern,
                                   Aetheria.Shared.csproj:27-29), pinned to the cultlib-unity-v1.1.0 commit
     stryker-config.json           mutate **/unity/org.gamecult.asura/Runtime/Core/**/*.cs
   .gitignore                      Unity host dirs, bin/obj, StrykerOutput
   ```
 - **Contract rules, headless (Core tests, Stryker):**
-  - `AsuraBodyDefinition` equality and hash cover Seed and Biome. Two
-    definitions that differ only in Seed are unequal.
-  - The seed-to-noise-offset derivation (`AsuraSeed.Offset(seed)`) runs on the
-    C# side and is uploaded, so the HLSL never re-derives it. It is
-    deterministic, bounded (every component in `[0, 256)` so snoise keeps float
-    precision), and distinct seeds give distinct offsets across a 10k-seed sweep.
-    Use CultMath's `pcg3d`, not a local hash.
+  - `AsuraBodyDefinition` equality and hash cover every field. Definitions that
+    differ in any single field are unequal.
+  - Seed-to-offset derivation (`AsuraSeed.Offsets(seed)`), one domain offset
+    per term:
+    - It runs in C# and is uploaded, so the HLSL never re-derives it.
+    - It is deterministic.
+    - Every component is bounded in `[0, 256)`, so noise keeps float precision.
+    - Distinct seeds give distinct offsets across a 10k-seed sweep.
+    - Distinct terms of one seed get distinct offsets, so craters and relief are
+      not correlated.
+    - It uses CultMath's `pcg3d`, not a local hash.
 - **Verification:**
   - Yggdrasil: `dotnet test tests/Asura.Core.Tests` with a non-zero count, then
     Stryker.
@@ -522,73 +721,302 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     compiles and Core types load). Log and PID in the scratchpad.
 - **Hands budget:** ~150k tokens.
 
-### Cut 4b. Asura: HLSL planet field, grid sampling, batched async readback
+### Cut 4b. Asura: the planet field (4b-i, 4b-ii, 4b-iii)
+
+The field is `f(p) = |p| − (1 + h(p̂))`, with `p̂ = p/|p|` (D3). It is a radial
+height: `h` depends on direction only, so there are no overhangs, `f` is linear
+along every ray from the centre, and every ray crosses `f = 0` exactly once, at
+`r = 1 + h(p̂)`. The analytic fixture kinds (Box, CraterRim) are the only
+non-radial fields. `h` composes terms chosen by the body's archetype.
+
+**Archetype → terms** (target, Q4; exemplars from the target):
+
+| Term | CultMath primitive (2a) | Used by |
+| --- | --- | --- |
+| macro relief | `fbm_grad` | every Planet body; amplitude per archetype |
+| craters (bowl, rim, ejecta falloff; several scales) | `cellular_grad`, `smin` | rock-dead: dense, saturated (Moon, Mercury); ice-dead: dense, relaxed, i.e. shallower with softer rims (Ganymede, Callisto); every active body: sparse, small scales only |
+| flood plains | smooth max of `h` with a flood level `L`, `−smin(−h, −L)` | rock-active (Io, Venus): lava-filled lows |
+| lineae (ridges and grooves along cell borders; 2–3 scales) | `cellular_edge_grad` | ice-active (Europa, Enceladus) |
+| aeolian dunes | `ridged_grad` (`1 − abs(snoise)`, stacked) | bodies with `Aeolian` (Mars, Titan, Venus exemplars). The lowest octave is **low frequency and high amplitude**: "push the terrain really far at really low frequency to influence the silhouette" (operator, 2026-09-25). A few giant crests bend the outline, with finer dune octaves on top. |
+| hydraulic erosion | Johansen's filter, sphere-adapted (4b-iii), using `phacelle` | bodies with `Eroded` (Mars, Earth-like), layered over any archetype |
+
+Asymmetric dunes (gentle windward, steep lee) are an optional tuning note, not a
+requirement. Two ways to get them: a domain warp along a prevailing-wind
+direction, or skewing `n` before `abs`. If either is tried, it is a parameter of
+the dune term, not a new term.
+
+**Parameters.** `Core/AsuraBodyParams.From(AsuraBodyDefinition)` produces the
+struct the GPU reads: term enables, amplitudes, frequencies, scale counts,
+densities, the flood level and `smin` k, dune octaves, erosion settings, and the
+per-term offsets from 4a. Values are drawn from the seed inside per-archetype
+ranges held in one table in Core. It also derives
+**`A_max = Σ` the terms' amplitude bounds**, the most `h` can rise above 1. This
+is parameter derivation, not field evaluation, so invariant 2 holds: C# never
+computes `h`.
+
+**Bounds and cell count** are a conscious trade, owned by Core:
+- Half-extent `B = 1 + A_max + 1.5·c`, where `c` is the cell size.
+- For a level of `n` samples per axis, `c = 2B/(n−1)`, solved together with `B`.
+- **Level selection works from the projected size of `c`, not of the nominal
+  radius.** A dune-heavy body with a large `A_max` spends more of its cells on
+  empty shell, so for the same screen size it gets a larger `n` to keep the same
+  cell size in pixels.
+- The ratio `(1+A_max)` is logged per body so the benchmark can show the cost.
+
+**D9 band limits** are computed in Core per dispatch. The footprint is uniform
+within a dispatch: `c` for sampling, `c/N` for tiles. For each multi-octave term,
+Core outputs the octave count and the last octave's fade weight, and the HLSL
+reads them. So band selection is Stryker-reachable, and the kernels contain no
+Nyquist logic of their own.
+
+**Derivatives (invariant 8).** Every term returns value and analytic gradient
+together, as `float4(∇.xyz, value.w)`, and composition uses the chain rule:
+- crater profile: `P(F1)` with gradient `P′(F1)·∇F1`, with rims joined by
+  `smin`, whose output gradient is the blended gradient;
+- lineae: the profile of `F2 − F1` times its gradient;
+- dunes: `ridged_grad`;
+- flood plains: the smooth max `−smin(−h, −L)`, with `L`'s gradient 0;
+- erosion: 4b-iii and Q12;
+- the sphere composition `∇f = u − (I − uuᵀ)∇h/|p|`.
+
+There are no finite differences anywhere in the field or its consumers.
+
+**Minimum proving set: three exemplar bodies, covering every term kind:**
+- **Moon:** rock, dead. Macro relief and dense craters.
+- **Europa:** ice, active. Lineae and sparse craters.
+- **Mars:** rock, dead, `Eroded` and `Aeolian`. Macro relief, craters, giant
+  dune crests on the silhouette, and erosion.
+
+Mars proves erosion over real crater walls and dune flanks, and it proves that
+terms compose. The two remaining archetypes, rock-active (flood plains with
+`smin`) and ice-dead (relaxed craters), are rows in the parameter table over
+terms the set already exercises. They cost about a table row and a test row
+each, so they land in 4b-ii with the lineae. If 4b-ii runs over budget, they are
+the first items deferred.
+
+This is three bodies rather than the brief's two-plus-erosion because the
+aeolian ruling added a term kind, dunes, that neither craters nor lineae
+exercise. Putting it on the eroded body instead of adding a fourth exemplar
+keeps the set at three and tests term composition for free.
+
+#### 4b-i. Field plumbing, grid sampling, readback, macro relief and craters (Moon)
 
 - **Adds:**
-  - `Runtime/Shaders/AsuraField.hlsl`, the **one** implementation of the planet
-    field (invariant 2):
-    - It includes
-      `Packages/org.gamecult.cultmath/Shaders/CultMath.hlsl`.
-    - It exposes `float asura_field(float3 p, AsuraBodyGpu body)`, where `p` is
-      in body-local unit space (D3). Inside is `<= 0`, matching surface nets.
-    - `f = |p| − 1 − displacement(p)`, with `displacement` switching on the
-      biome.
-    - Dunes: large-scale banded ridges built from `cultmath_fbm` and ridged
-      terms, with amplitude big enough to move the silhouette.
-    - Craters: bowls and rims from `cultmath_cellular`, joined with `max` or
-      `cultmath_smin` terms.
-    - The analytic kinds.
-
-    Each biome declares `maxAbsDisplacement`.
-  - `AsuraField.hlsl` also exposes `asura_field_gradient(p, body, h)` as central
-    differences. It serves Cut 6. CultMath has no analytic derivatives; if the
-    benchmark shows the six extra evaluations are the cap, analytic snoise
-    derivatives are a CultMath gap to fill there.
+  - `Runtime/Shaders/AsuraField.hlsl`, the **one** implementation of the field
+    (invariant 2). It includes `Packages/org.gamecult.cultmath/Shaders/CultMath.hlsl`.
+    - `float4 asura_height(float3 u, AsuraBodyGpu body, AsuraBand band)`
+      returns `(∇h.xyz, h.w)`. This is the 3D gradient of the terms, before
+      projection.
+    - `float4 asura_field(float3 p, AsuraBodyGpu body, AsuraBand band)` returns
+      `(∇f.xyz, f.w)`, built from `asura_height`, with
+      `∇f = u − (I − uuᵀ)∇h/|p|`, where `u = p/|p|` (D8). At `|p| < ε` it returns a finite negative `f`,
+      because the centre is inside.
+    - The analytic kinds are implemented through the same entry point.
   - `Runtime/Shaders/AsuraSample.compute`: one kernel samples every pending
     body's grid into one flat `RWStructuredBuffer<float>`. A per-body table holds
-    offset, dims, origin, cell size, and the seed offset and biome. The linear
-    index within a body is `(x*ny + y)*nz + z`.
+    offset, dims, origin, `c`, params and band. The linear index within a body is
+    `(x*ny + y)*nz + z`.
+  - `Runtime/Shaders/AsuraEval.compute`: evaluates `asura_field` at a list of
+    points and returns `(f, ∇f)`. Tests use it for continuity and gradient
+    checks, and 7c's dock query uses it.
   - `Runtime/AsuraSampler.cs`:
-    - Once per frame it packs the pending bodies up to a sample budget, makes one
+    - Once per frame it packs pending bodies up to a sample budget, makes one
       dispatch and one `AsyncGPUReadback.Request(buffer, size, offset, cb)`.
     - It keeps a ring of K sample buffers. A buffer is never re-dispatched while
       its readback is in flight; when all K are in flight, it skips the frame.
-    - In the callback it copies each body's slice into a fresh `float[,,]` with
-      one memcpy (`fixed (float* d = &grid[0,0,0])` and
-      `UnsafeUtility.MemCpy`).
-  - Grid bounds per body are the cube `±(1 + maxAbsDisplacement + margin)`, with
-    margin ≥ 1 cell. Origin and cell size are derived so that the edge samples
-    are strictly outside.
-- **Mechanism probed in this pass:** a C# `float[,,]`'s memory is row-major.
+    - In the callback, each body's slice is copied into a fresh `float[,,]` with
+      one memcpy (`fixed (float* d = &grid[0,0,0])` and `UnsafeUtility.MemCpy`).
+  - `Core/AsuraBodyParams` (the Moon rows), `Core/AsuraBounds` (B, c, level from
+    projected `c`) and `Core/AsuraBand`.
+- **Mechanism probed in pass 1:** a C# `float[,,]`'s memory is row-major.
   `Buffer.BlockCopy` of a flat `(x*ny+y)*nz+z` array into `float[2,3,4]` lands
-  `[1,2,3] == 23`. A net10 scratch probe confirmed it, so the GPU layout above
-  memcpys straight into the array `Extract` takes.
+  `[1,2,3] == 23`, so the GPU layout memcpys straight into the array `Extract`
+  takes.
 - **Authority map:**
-  - Owner: `AsuraField.hlsl` owns shape.
-  - Inputs: definition, level and seed offset.
-  - Outputs: grid samples.
+  - Owner: `AsuraField.hlsl` owns shape. Core owns parameters, bounds and bands
+    (numbers about the field, never values of it).
+  - Inputs: definition, level and footprint.
+  - Outputs: grid samples, and point evaluations.
   - Derived: the `float[,,]` copy is a cache, dropped once meshed.
-  - Forbidden writers: any C# evaluation of the planet field; anything writing
-    the sample buffer except `AsuraSample.compute`.
-- **Verification (Starfire, host EditMode tests on the real GPU, one job):**
-  - Assert `SystemInfo.supportsAsyncGPUReadback` on the device. If it is false,
-    Asura refuses loudly and keeps stand-ins.
-  - **Layout:** the `Plane` kind (`f = a·p + b` with distinct a.x, a.y, a.z),
-    sampled on a 5×7×9 grid and read back into `float[,,]`, equals the closed
-    form at every index within float epsilon. This kills axis swaps and wrong
-    strides.
-  - **Ring integrity:** submit 4K bodies of the Plane kind with distinct
-    coefficients over consecutive frames (PlayMode, `yield return null`). Every
-    body's grid matches its own closed form, so no slice is overwritten in
-    flight.
-  - **Closure bound:** for each biome × 64 seeds × 3 levels, every boundary
-    sample is `> 0`. This pins `maxAbsDisplacement`.
-  - **Determinism:** the same definition sampled twice on this machine gives
-    bit-equal grids. Invariant 6, same-machine; see Q7.
-  - **Seed:** two seeds of the same biome give different grids.
-  - negative: `rg -n "snoise|asura_field" unity/org.gamecult.asura -g "*.cs"` → 0.
-    C# never evaluates the field.
+  - Forbidden writers:
+    - any C# evaluation of `h` or `f`;
+    - anything writing the sample buffer except `AsuraSample.compute`;
+    - any kernel-side octave or Nyquist logic.
+- **Verification:**
+  - Yggdrasil: Core tests and Stryker. The rules:
+    - params are deterministic per seed and inside the archetype ranges;
+    - `A_max ≥` the sum of enabled term bounds;
+    - bounds satisfy `B ≥ 1 + A_max + c`;
+    - level selection uses `c`: two bodies at the same screen size with
+      different `A_max` get different `n`, and the larger `A_max` gets the larger
+      `n`;
+    - band octave count is monotone non-increasing in footprint and never
+      exceeds the term's maximum;
+    - the last octave's weight is in [0,1] and is 1 when the octave is far below
+      Nyquist.
+  - Starfire, host EditMode on the real GPU, one job:
+    - assert `SystemInfo.supportsAsyncGPUReadback`; if it is false, Asura refuses
+      loudly and keeps stand-ins;
+    - **Layout:** the Plane kind (`f = a·p + b` with distinct a.x, a.y, a.z) on a
+      5×7×9 grid reads back equal to the closed form at every index;
+    - **Ring integrity:** 4K Plane bodies with distinct coefficients over
+      consecutive PlayMode frames; every grid matches its own closed form;
+    - **Radial exactness:** for Moon bodies, `AsuraEval` at `(1 + h(d))·d` gives
+      `|f| ≤ ε` for 10k random directions;
+    - **Closure:** for Moon × 64 seeds × 3 levels, every boundary sample is
+      `> 0`;
+    - **Gradient (invariant 8, the highest-risk site):** the analytic `∇f` of
+      the full composed field, read back from `AsuraEval`, matches central
+      differences of `f` (at h = 1e-3·c):
+      - angle p99 < 0.5° and relative magnitude error p99 < 1e-2;
+      - at seeded random points at **`|p|` ∈ {0.6, 1.0, 1.4}**, excluding a band
+        of 2h around crater rims (cellular borders);
+      - `|p| ≠ 1` is mandatory, because at `|p| = 1` a missing `1/|p|` factor is
+        invisible. Moon terms produce a 3D gradient with a radial component, so
+        a dropped `(I − uuᵀ)` projection fails too.
+      - Also run the same check on the Sphere kind with a synthetic zonal term
+        `h(u) = a·u.z`, whose `∇f` has a closed form. It pins the sign of the
+        tangential term, in case both the implementation and FD are wrong the
+        same way.
+    - **Determinism:** the same definition sampled twice gives bit-equal grids
+      (invariant 6, same machine);
+    - **Seed:** two seeds give different grids.
+  - negative: `rg -n "snoise|cellular|asura_field|asura_height" unity/org.gamecult.asura -g "*.cs"` → 0.
+    C# never evaluates the field; band and params code must not call the
+    primitives.
 - **Hands budget:** ~200k tokens.
+
+#### 4b-ii. The remaining terms: lineae, dunes, flood plains, relaxed craters (Europa, Mars minus erosion)
+
+- **Adds:**
+  - Lineae, from `cellular_edge_grad` at 2–3 scales, forming ridge pairs
+    (Europa's double ridges) where `F2 − F1` is small.
+  - Dunes, from `ridged_grad` with a low-frequency, high-amplitude first octave.
+  - Flood plains, as the smooth max `−smin(−h, −L)`.
+  - Relaxed crater profiles for ice.
+  - The table rows for all four archetypes plus the `Aeolian` and `Eroded`
+    switches (erosion's parameters exist, but its term is a no-op until 4b-iii).
+  - The analytic `DuneCrest` kind, a single ridged crest line with a known
+    closed form, used by 6c.
+- **Verification (Starfire):**
+  - closure for every archetype × `Aeolian` × 64 seeds × 3 levels;
+  - the invariant-8 gradient check as in 4b-i for every archetype, masking a
+    band around dune crests (`nᵢ = 0`) and lineae borders;
+  - radial exactness per archetype;
+  - **silhouette:** a Mars body without erosion, at a 12³ grid, shows its
+    lowest dune octave in the mesh outline. Pin it as: the max radial extent
+    over the mesh vertices exceeds `1 + 0.5·A_dune`;
+  - Core:
+    - lineae enabled iff the body is ice and active;
+    - dunes enabled iff `Aeolian`;
+    - dead bodies have a higher crater density than active ones at the same
+      seed;
+    - ice craters are shallower than rock craters.
+- **Hands budget:** ~150k tokens.
+
+#### 4b-iii. Hydraulic erosion on the sphere (Mars)
+
+- **Adds:**
+  - `Runtime/Shaders/AsuraErosion.hlsl`: Johansen's Advanced Terrain Erosion
+    Filter, ported with attribution under MPL-2.0 (Q9 makes Asura MPL-2.0).
+  - `unity/org.gamecult.asura/EROSION-PROVENANCE.md`, which records:
+    - Rune Skovbo Johansen, Advanced Terrain Erosion Filter (© 2025, MPL-2.0),
+      Shadertoy `wXcfWn`, explained at
+      `blog.runevision.com/2026/03/fast-and-gorgeous-erosion-filter.html`;
+    - the earlier work it credits, by Clay John (Shadertoy `MtGcWh`, MIT) and
+      Felix Westin / Fewes (`7ljcRW`, MIT);
+    - the reference transcription consulted: `github.com/lpmitchell/AdvancedTerrainErosion`,
+      whose `ErosionFilter` and `PhacelleNoise` are marked MPL-2.0 and derived
+      from `wXcfWn`;
+    - that the sphere adaptation below is new. It is not in upstream, which is
+      written for planar heightfields.
+
+    Shadertoy returns 403 to automated fetches. If Hands needs the original
+    shader text, the operator opens it in a browser. The lpmitchell port carries
+    the procedure line for line.
+  - **Not a source:** CultLib's July port (`gamecult_geometry_advanced_erosion_filter`
+    and `spherical_erosion`, tag `b65619f`). Asura does not build on that line
+    (target, "Not consumers"). Its `spherical_erosion` also lerps raw phases
+    across cells instead of blending phasors, which is not Phacelle.
+- **Derivatives (invariant 8; see Q12).** Erosion's gradient output is
+  upstream's own analytic derivative. In each octave the slope contribution is
+  `mask · gullyWeight · ∇cos · strength`, and the gully direction, masks and
+  fade target are treated as locally constant. The probe shows this is **far
+  from the exact derivative**: 15° median and 62° at the 95th percentile against
+  central differences. That holds even with an exact Phacelle gradient: 13° and
+  63°.
+  - The gap is structural. The flow direction, the masks and the fade target
+    all depend on `∇h_base`, so the exact first derivative of the eroded height
+    needs `∇²h`, the second derivative, of every base term. The `sign()` in the
+    gully update is nonsmooth as well.
+  - So erosion cannot meet invariant 8's finite-difference tolerance without a
+    Hessian flow through every term. **Q12** puts that fork to the operator.
+    The map is written for recommendation A: upstream's derivative, with a
+    measured, recorded bound, and no finite differences anywhere.
+  - Curvature, the article's feature that needs a second derivative, is out of
+    this campaign. Record it.
+- **The sphere adaptation.** This is design; the probe below backs it.
+  - Erosion runs in the **tangent space of the unit sphere**, entirely in 3D
+    vectors. Its inputs:
+    - the base `h`: every other term, band-limited;
+    - the base tangential gradient `∇_T h = ∇h − p̂(p̂·∇h)`, analytic (D8);
+    - the fade target, `clamp(h_base / (0.6·A_relief), −1, 1)`, as upstream.
+  - The gully slope is a 3D tangent vector. It is re-projected onto the tangent
+    plane after every octave's update (`g ← g − p̂(p̂·g)`).
+  - Stripe cells live in **3D**: `phacelle(p̂·freq, side, 0.25, normalization)`,
+    with `side = cross(p̂, normalize(gully)) · cellScale · τ`, which is tangent
+    and perpendicular to the flow. The derivative direction is `side · −freq`,
+    as upstream's `phacelle.zw · −freq`.
+  - The output is a height delta added to `h`, and a slope delta added to
+    `∇_T h` (D8).
+  - Octave count and last-octave weight come from D9.
+  - **Rejected: a cube-face domain** (a gnomonic uv per face, upstream 2D
+    Phacelle, faces blended as in lpmitchell's `AccumulateFace` and
+    `DirectionToFaceUv`). The probe below shows why.
+- **Probe (this pass).** A scratch net10 C#
+  prototype of the full octave loop, with a smooth analytic base height, scale
+  0.15 and 5 octaves. It measured the max `|Δh|` between points a step `s` apart
+  along 40 random great-circle arcs:
+
+  | Variant | s = 1e-3 | 1e-4 | 1e-5 | Verdict |
+  | --- | --- | --- | --- | --- |
+  | 3D-cell Phacelle alone | 3.4e-1 | 3.5e-2 | 3.5e-3 | continuous (scales with s) |
+  | erosion, 3D cells | 2.9e-3 | 3.1e-4 | 3.1e-5 | continuous across cell boundaries, no seams |
+  | erosion, cube faces, hard switch | 2.5e-2 | 1.4e-2 | 1.2e-2 | **discontinuous**: a ~0.012 jump at face edges, about the size of the erosion itself |
+  | erosion, cube faces, smoothstep blend (width 0.1 and 0.3) | 5.5e-3 | 6.5e-4 | 6.4e-5 | continuous, but erosion RMS near the seams is 0.73–0.75 of the interior: two unrelated gully networks are cross-faded, and gullies do not connect across the seam |
+
+  More from the same probe:
+  - Stripe alignment, `mean|∂/∂flow| / mean|∂/∂side|`: 0.212 on the sphere with
+    3D cells, against 0.202 for upstream's planar 2D function. The adaptation
+    keeps the stripes along the flow as well as upstream does.
+  - Phacelle's own derivative: upstream's convention, `∇cos ≈ −sin·side`,
+    ignores the weight gradient. Against central differences it is 16.8° off at
+    the median and 97.8° at the 95th percentile. The **exact** gradient
+    (weights and normalisation included) is 0.00° at the median and 0.03° at the
+    95th percentile. So 2a-ii ships the exact form (invariant 8), and upstream's
+    shortcut is not reproduced.
+  - Cost, measured on CPU as a ratio only: 3D cells take 19.5 µs per 5-octave
+    sample, against 5.8 µs for blended cube faces, 3.4× as much. On average only
+    14.0 of the 64 visited cells have non-zero weight. 2a-ii's exact pruning and
+    D9's band limits are the planned savings. GPU cost is measured in 5b.
+- **Verification (Starfire, through `AsuraEval`):**
+  - **Continuity on the GPU:** the probe's arc test (40 arcs; `s` = 1e-3, 1e-4,
+    1e-5) on a Mars body. The max `|Δh|` must shrink at least 5× per 10× step.
+  - **Switch:** with `Eroded` off, `h` is bit-equal to 4b-ii's output. With it
+    on, `h` differs.
+  - **Gradient accuracy, per Q12:**
+    - Under A, report the angle distribution of the eroded `∇f` against central
+      differences, and commit it as a regression bound. The probe's CPU
+      baseline is p50 ≤ 20°, p95 ≤ 70°.
+    - The **non-erosion part** of an eroded body's gradient (erosion's
+      contribution subtracted) must still pass 4b-i's tight invariant-8 check.
+      That proves the approximation is confined to the erosion term.
+  - **Closure** for eroded bodies × 64 seeds: `A_max` must include erosion's
+    magnitude, which upstream accumulates as `magnitude`.
+  - operator: the Mars body in the host scene, orbiting camera. Gullies branch
+    downhill off crater walls and dune flanks, and there is no visible seam or
+    grid pattern.
+- **Hands budget:** ~180k tokens.
 
 ### Cut 5a. Asura: worker-thread meshing and bare-mesh rendering
 
@@ -611,8 +1039,10 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     `SetIndices(..., MeshTopology.Quads)` with face-weighted normals, under a
     per-frame upload budget. It renders with Unity's built-in `Standard` shader.
     No new shader in this cut.
-  - `Core/AsuraLevels`: projected pixel diameter to grid level, from a quantised
-    table (for example 8, 12, 16, 24, 32, 48, 64). Downgrades have hysteresis.
+  - `Core/AsuraLevels`: the projected size of the cell `c` (4b's bounds, which
+    depend on `A_max`), not of the nominal radius, to grid level, from a
+    quantised table (for example 8, 12, 16, 24, 32, 48, 64). Downgrades have
+    hysteresis.
     A level change remeshes, and the old mesh stays visible until the new one is
     ready.
   - **Stand-in switch.** Asura owns it, through the `standIn` renderer Aetheria
@@ -630,9 +1060,9 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
 - **Verification:**
   - Core tests and Stryker on Yggdrasil.
   - Host PlayMode on Starfire:
-    - a Dunes body at 3 levels meshes and closes (every edge used by an even
-      number of quads, and exactly 2 at the tested seeds) on the **real sampled
-      grid**, not a CPU fixture;
+    - each proving-set body (Moon, Europa, Mars) at 3 levels meshes and closes
+      on the **real sampled grid**, not a CPU fixture: every edge is used by an
+      even number of quads, and exactly 2 at the tested seeds;
     - removal mid-build leaves no mesh and no leaked `Mesh` (count `Mesh`
       objects before and after);
     - the stand-in/mesh exclusivity rule is checked every frame across a level
@@ -651,6 +1081,12 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     mesh ms per body on workers, and upload.
   - Mode "mesh-only (tiles pending)" is measured here; Cut 6b adds the tiled
     columns.
+  - **Rows per archetype**, because erosion's per-sample cost dominates: Moon,
+    Europa, Mars without erosion, and Mars with erosion. Each row records its
+    `(1 + A_max)` shell factor.
+  - A **field microbenchmark**: `AsuraEval` samples per millisecond for each row,
+    so the grid-sampling cost is separable from readback and meshing.
+  - Expectation per D8: one field evaluation per grid sample, not 4–7.
   - Output: `docs/benchmarks/<date>-<host>.md`, a table. Its header records GPU
     name and driver, CPU, Unity version, Asura, CultLib and CultMath SHAs, and
     "editor PlayMode, batchmode". Committed.
@@ -676,8 +1112,21 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
       refined endpoints; bilinear of the four refined corners);
     - is refined onto `f = 0` by normal-constrained Newton: a fixed iteration
       count, moving along the gradient direction at the start point, with the
-      step clamped to one base cell;
-    - stores the gradient normal and a biome material (packed RGBA8).
+      step clamped to one base cell. Each iteration is **one** `asura_field`
+      call, reading value and analytic gradient together (D8). There are no
+      finite differences.
+      - The field is a radial height, so it is linear along rays and has
+        moderate slopes at low frequency. Newton is therefore well-conditioned
+        everywhere except at crease discontinuities: dune crests, crater rims and
+        lineae. There the gradient flips across the crease, and the step clamp
+        plus 6c's snapping take over;
+    - stores the analytic gradient normal and an archetype material, packed
+      RGBA8. Rock and ice differ; so do crater floor, rim and ejecta, lineae,
+      dune sand and eroded channels, using the terms' own masks. The gullies
+      come from erosion's ridge map, which upstream emits beside the height.
+    - evaluates with the tile footprint `c/N` (D9), so erosion and dune octaves
+      that the grid could not resolve appear at tile resolution. The tile pass
+      evaluates the same field, so no extra code is needed for this.
 
     Vertex points are refined first, so edge and interior start points read
     refined corners.
@@ -702,8 +1151,11 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     surface.
   - **Normals:** on the Sphere, `dot(normal, normalize(p)) ≥ 1 − 1e-3` at every
     point.
-  - **Dunes:** `|f(p)| ≤ ε·cell` for every point, and no point moves more than
-    one base cell.
+  - **Proving set:** on Moon, Europa and Mars (eroded), `|f(p)| ≤ ε·cell` for
+    every point away from creases, and no point moves more than one base cell.
+  - **Normals are the analytic gradient:** the stored normal equals
+    `normalize(∇f)` from `AsuraEval` at the stored position, bit for bit. That
+    proves the tile kernel reads the one gradient path and does not re-derive it.
   - Core tests and Stryker for the layout offsets and edge derivation (each
     unique edge appears once; key order is canonical).
 - **Hands budget:** ~200k tokens.
@@ -729,7 +1181,7 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
   - The benchmark (5b) gains columns: tiled at N ∈ {1, 2, 4, 8}, per grid size.
     A new committed results file is written; the old one is kept.
 - **Verification (Starfire):**
-  - **Watertight:** for Sphere, Dunes and Craters at N ∈ {1, 2, 4, 8} × 2 levels,
+  - **Watertight:** for Sphere, Moon, Europa and Mars (eroded) at N ∈ {1, 2, 4, 8} × 2 levels,
     read back `AsuraPatchExpand`. Each undirected triangle edge, keyed by the
     **exact bit patterns** of its two endpoints, appears an even number of times,
     and exactly twice on the Sphere. Report per case the edge count and the
@@ -738,8 +1190,9 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     field gradient at its centroid.
   - **Exclusivity:** the bare-mesh/patch switch never shows both and never
     neither, across a retile.
-  - operator: the dunes planet in the host scene, orbiting camera: the
-    silhouette shows the dunes.
+  - operator: Mars in the host scene, orbiting camera. The giant dune crests
+    bend the silhouette, and erosion gullies appear as the camera closes in (N
+    rises).
 - **Hands budget:** ~180k tokens.
 
 ### Cut 6c. Asura: crease snapping from field gradients in the tile pass
@@ -747,9 +1200,10 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
 - **Adds**, in the tile kernels, after refinement, for every point (vertex points
   included, so N = 1 gets sharp base vertices and the mesher stays pure surface
   nets):
-  - It samples `asura_field_gradient` on a stencil of fixed offsets in
-    **body-local space**. The offsets depend only on (body, grid level): never
-    on the quad, N or patch coordinates.
+  - It evaluates `asura_field` on a stencil of fixed offsets in
+    **body-local space** and reads the analytic gradients (D8; no finite
+    differences). The offsets depend only on (body, grid level): never on the
+    quad, N or patch coordinates.
   - It clusters the gradients into families by an angle threshold.
   - With 2 or more families, it solves a small QEF over the tangent planes
     (two planes give the nearest point on the crease line, three give the
@@ -777,6 +1231,26 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     triggers", not merely "small effect".
   - **CraterRim** kind (a max of terms): points within one cell of the analytic
     rim circle lie within ε of it; zero folds; watertight.
+  - **DuneCrest** kind (4b-ii: a ridged `1 − |n|` crest with a closed form), at
+    N ∈ {1, 2, 4, 8}:
+    - patch points within one cell of the crest line land within ε of it;
+    - zero folds; watertight;
+    - the fixture includes a **low-frequency, high-amplitude crest that shows in
+      the silhouette at a 12³ grid**.
+  - **Small-body silhouette (N = 1 is load-bearing).** The operator's giant dune
+    crests are creases *on the outline*. At 10³–12³, surface nets rounds a crest
+    to about the grid spacing, and a rock rendered at N = 1 has no patch
+    interior to recover it. So snapping the base vertices is the only thing that
+    keeps the crest sharp on small bodies.
+    - Test: a Mars body at 12³ with N = 1. The max radial extent of the snapped
+      base vertices near the crest comes within ε·c of the analytic crest height.
+      Without snapping it falls short by about a cell, so the test also reports
+      the unsnapped shortfall as its control.
+  - **Eroded control:** on eroded Mars, report the snapped-point count and prove
+    zero folds. Under Q12's recommendation, erosion's gradient is upstream's
+    approximation. False crease families in gully networks would show here as a
+    count out of proportion to the real creases (crests, rims). Report it for
+    Self; do not tune it away.
   - The benchmark gets one more run to record snapping's cost.
 - **Hands budget:** ~180k tokens.
 
@@ -788,14 +1262,24 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
 
 ### Cut 7a. Aetheria: planet definitions from zone generation (headless)
 
-- **Repo/branch:** Aetheria, `hands/asura-7a`, based per Q1. Worktree.
+- **Repo/branch:** Aetheria, `hands/asura-7a`, from `master` after fire-control
+  merges (Q1). Worktree. Re-pin anchors at dispatch.
 - **Per-file changes (master `9b85211f`):**
-  - `Assets/Scripts/ServerShared/ZoneData.cs:69-73`: `PlanetData` gains
-    `[Key(9)] uint Seed` and `[Key(10)] string Biome`, using the Asura biome
-    name. It is a string so ServerShared never references Asura; see the
-    negative check below. The document version follows Aetheria's
-    schema-evolution rule for `aetheria.planetdata`, and Hands reads that rule
-    before choosing. Old records per Q3.
+  - `Assets/Scripts/ServerShared/ZoneData.cs:69-73`: `PlanetData` gains:
+    - `[Key(9)] uint Seed`;
+    - `[Key(10)] BodyMaterial Material`, a ServerShared enum `Rock | Ice`;
+    - `[Key(11)] bool Active`;
+    - `[Key(12)] bool Eroded`;
+    - `[Key(13)] bool Aeolian`.
+
+    Aetheria owns the definition (target identity table), so the vocabulary is
+    Aetheria's. 7b maps it field by field onto `AsuraBodyDefinition` at the
+    ZoneRenderer seam, and ServerShared never references Asura (negative check
+    below). The document version follows Aetheria's schema-evolution rule for
+    `aetheria.planetdata`; Hands reads that rule before choosing.
+  - **Old records (Q3, ruled 2026-09-25):** a `PlanetData` with `Seed == 0`
+    fails loudly on load, and the run regenerates. There is no compatibility
+    path. The loud failure needs its own test.
   - `Assets/Scripts/ServerShared/ZoneGenerator.cs:125-128` (the Planet/Planetoid
     branch):
     - Seed comes from a **local** generator built from the zone's stable hash
@@ -806,10 +1290,18 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
       so existing galaxies would regenerate differently.
     - This is the same pattern as fire-control 6b's `CombatSeed` plus a local
       generator (`Zone.cs` on `ab14552a`).
-    - Biome comes from the seed per Q3.
+    - The archetype comes from the seed (Q3), drawn from the same **local**
+      generator after the seed. The material and activity draw is uniform over
+      the four archetypes. `Eroded` and `Aeolian` are independent draws, at the
+      probabilities in Q10. The probabilities live as `ZoneGenerationSettings`
+      entries, so a later content pass can tune them, or band them by mass,
+      without code.
 - **Contract rules (`tests/Aetheria.Shared.Tests`, Stryker via the fire-control
   line's `stryker-config.json`):**
-  - The same galaxy zone gives the same seeds and biomes.
+  - The same galaxy zone gives the same seeds and archetypes.
+  - Across a 10k-zone sweep, archetype frequencies match the configured
+    probabilities within binomial tolerance. This kills a hard-coded archetype
+    and a draw that ignores its probability.
   - Distinct planets in one zone get distinct seeds.
   - **Every other field of the generated `ZonePack` and its bodies is unchanged
     against a capture taken at the base commit.** Capture it at the base, not
@@ -834,8 +1326,10 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
       object in `ARPG.unity` wired to it;
     - `SetCamera(MainCamera)` in `Start` (`:174`).
   - `ZoneRenderer.cs:394-403`, the rocky branch: after `Instantiate(Planet)`,
-    call `Asura.Add(key, def(PlanetData.Seed, Biome), planet.Body.transform,
-    planet.Body)`.
+    call `Asura.Add(key, AsuraBodyDefinition{Seed, Material, Active, Eroded,
+    Aeolian}, planet.Body.transform, planet.Body)`. The mapping from
+    `PlanetData` is the one seam between the two vocabularies, and it has a test
+    covering every field.
     - `planet.Body` is the `Terrain Mesh` renderer: `high-res-sphere.fbx` with
       `Planet.mat`. It is the stand-in; see the finding on the target's "flat
       quad".
@@ -850,19 +1344,28 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
   - the Aetheria EditMode suite;
   - a PlayMode smoke: load a zone and assert that every rocky body reaches ready
     within T seconds, and that exclusivity holds;
-  - on the fire-control line, `EngineAssetCheck.Run` exits 0;
-  - operator: enter zones and see rocky planets as dunes or craters, varying by
-    seed and stable across reloads. Gas giants and suns are unchanged.
+  - `EngineAssetCheck.Run` exits 0;
+  - operator: enter zones and see rocky and icy bodies (cratered, lined, duned,
+    eroded) varying by seed and stable across reloads. Gas giants and suns are
+    unchanged.
 - **Hands budget:** ~180k tokens.
 
 ### Cut 7c. Docked view: dock-site query and raised N with per-edge stitching
 
-- **Blocked on Q6.**
+- **Q6, ruled 2026-09-25: presentation only.**
+  - The station stands on its parent rocky planet, at a direction derived from
+    the station's key.
+  - Simulation positions are unchanged.
+  - Stations whose parent is not a rocky `PlanetData` keep today's dock view.
+  - The flattened pad waits.
 - **Adds (Asura):**
-  - `AsuraQuery.compute`, which includes `AsuraField.hlsl`. For a body and a
-    direction it finds the outermost `f = 0` crossing, marching inward from the
-    bound and then bisecting, and returns the point and the gradient normal.
-    Readback is async. This is the target's field query; it never reads the atlas.
+  - The dock query is `AsuraEval` (4b-i) plus a closed form. The field is a
+    radial height (4b), so the surface along direction `u` is exactly
+    `(1 + h(u))·u`. It is one `asura_height` evaluation, and its analytic
+    gradient gives the normal `normalize(∇f)`. There is no marching and no
+    bisection. The query uses a fixed small footprint (D9), so the station sits
+    on full detail. Readback is async. This is the target's field query; it
+    never reads the atlas.
   - `SetFocus(key, direction, radius)`: quads whose centres lie within the focus
     radius get `N_hi`, and the rest get the body's N.
   - Per-edge factor, keyed by the mesh edge (D4): `E(edge) = max(N_a, N_b)`.
@@ -870,8 +1373,11 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     each quad's boundary rows to its edges' factors.
   - The layout moves from uniform slots to per-quad offsets, computed in Core.
 - **Adds (Aetheria), per Q6:**
-  - The dock-site direction is derived from the station's identity; Aetheria
-    owns it.
+  - The dock-site direction is derived from the station's record key, a stable
+    hash mapped to a unit vector. It lives in ServerShared or Unity-side
+    Aetheria code, never in Asura, because Aetheria owns it (target identity
+    table). Test: the same key gives the same direction, and distinct keys give
+    distinct directions.
   - `ActionGameManager.cs:863-881` (`DoDock`): when the parent orbit body is a
     rocky `PlanetData`, frame the close-up. The station asset is placed at the
     query point and aligned to the normal, and `SetFocus` is called. Otherwise
@@ -879,26 +1385,28 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     the focus.
 - **Verification:**
   - Starfire:
-    - on the Sphere kind, the query returns `R·dir ± ε`, with normal = dir;
+    - on the Sphere kind, the query returns `dir ± ε` (unit radius), with
+      normal = dir. On Moon, `AsuraEval` at the returned point gives
+      `|f| ≤ ε`;
     - watertight: 6b's bit-edge check at **mixed** N (focus on, `N_hi`
       ∈ {4, 8, 16} beside N ∈ {1, 2}), zero odd edges and zero folds;
     - Core Stryker on the per-edge factor and offsets.
   - operator: dock at a station orbiting a rocky planet. The station sits on the
     surface without floating or sinking, and there is no crack at the N
     boundary.
-- **Hands budget:** ~200k tokens. If Q6 adds the flattened pad (a `cultmath_smin`
-  of a plane into the field), split it into 7d.
+- **Hands budget:** ~200k tokens. The flattened pad (a `smin_grad` blend of a
+  plane into `h`) is deferred by Q6. If it is ever ruled in, it is its own cut.
 
 ## Subtraction ledger (estimates)
 
 | Cut | Removed | Added | Deps/targets |
 | --- | --- | --- | --- |
-| 1 | 310 files, 11,344 text lines, 16 LFS binaries, ~60 C#/YAML lines (+3 files per Q2) | 0 | −1 third-party plugin |
-| 2a | 0 | ~90 C#, ~70 HLSL, ~150 test | cultmath-unity 0.3.0 |
+| 1 | 310 files, 11,344 text lines, 16 LFS binaries, ~60 C#/YAML lines, 2 prefabs + 1 asset (Q2) | 0 | −1 third-party plugin |
+| 2a-i/ii | 0 | ~300 C#, ~260 HLSL, ~400 test, notices entries | cultmath-unity 0.3.0 |
 | 2 | 0 | ~220 C#, ~300 test, 1 md, 1 Stryker config | none |
 | 3 | 0 | ~20 script, 1 asmdef line, 2 metas, 1 DLL+pdb | cultlib-unity 1.1.0 |
 | 4a | 0 | package skeleton, host project, ~150 C#, 1 test csproj | +1 Unity package, +1 host project, +1 test project |
-| 4b | 0 | ~150 HLSL, ~200 C#, ~250 test | none |
+| 4b-i/ii/iii | 0 | ~450 HLSL, ~350 C#, ~450 test, 1 provenance md | none |
 | 5a/5b | 0 | ~350 C#, ~250 test, 1 results doc | none |
 | 6a/6b/6c | 0 | ~450 HLSL, ~250 C#, ~400 test, 2 results docs | none |
 | 7a/7b/7c | ~5 lines | ~150 Aetheria C#, ~250 Asura, ~200 test | Aetheria +1 UPM dep (asura) |
@@ -909,123 +1417,128 @@ toward it.
 
 ## Operator questions
 
-- **Q1. Which Aetheria line do Cuts 1 and 7 land on?**
-  - A: wait until the fire-control line (`ab14552a`, 218 commits ahead of
-    master) merges to master, then branch from master.
-  - B: branch from master `9b85211f` now.
-  - C: stack on the fire-control line.
+### Answered (2026-09-25; the target's "Rulings on the cut map's questions" owns the wording)
 
-  **Recommended: A.** Cuts 2–6 need nothing from Aetheria, so waiting costs
-  nothing on the critical path. B would conflict with settings Cut 0's
-  `GameSettings.cs` edits and with the manifest pins. C couples Asura to
-  unreviewed in-flight work.
-- **Q2. `PlanetOutpost.prefab` and `Locations/ReconStationAlpha.{prefab,asset}`
-  use the plugin.** Nothing but the content catalog (not yet decoded) could
-  reference them.
-  - A: delete them in Cut 1, if the decode finds no consumer.
-  - B: keep them, stripping the plugin component and material. Their bodies then
-    render with no material.
+- **Q1 (Aetheria line):** Cuts 1 and 7 land on `master` after fire-control
+  merges. This was the recommendation. Applied in Cuts 1, 7a and 7b.
+- **Q2 (outpost and recon assets):** delete them with the plugin. Applied in
+  Cut 1.
+- **Q3 (seeds, archetype, old saves):**
+  - Seed from a local generator that never draws from the zone stream.
+  - Archetype by seed for now.
+  - Old saves with no seed fail loudly and regenerate, with no compatibility
+    path.
 
-  **Recommended: A.** It is the subtraction cut, and PlanetOutpost's concept (a
-  station on a planet) is what 7c builds properly. If the decode finds a
-  consumer, Hands stops.
-- **Q3. Seeds, biomes and old saves.**
-  - (a) Seed from a local generator (zone hash and planet index) that never
-    consumes the zone stream. **Recommended**, as above.
-  - (b) Biome: uniform by seed over Asura's biome set now, or banded by mass
-    (planetoid vs planet), using the existing
-    `BodyType.Planetoid`/`Planet` split at `ZoneGenerator.cs:117`?
-    **Recommended: uniform now,** with a mass band added later as a
-    `ZoneGenerationSettings` entry.
-  - (c) Stored `PlanetData` without a Seed, in existing runs: should they
-    (A) fail loudly and be regenerated, or (B) derive a seed from the record key
-    on load? **Recommended: A.** B is a compatibility path that keeps deciding
-    shape forever. Is there any saved run you need to keep?
-- **Q4. The second minimal biome.**
-  - A: craters. This needs `cultmath_cellular` in 2a, and craters are the
-    asteroid look.
-  - B: rugged fBm. It needs no extra CultMath.
+  Applied in Cut 7a.
+- **Q4 (the second biome):** superseded by a larger ruling. Bodies are
+  archetypes: material (rock | ice) × activity (dead | active), with hydraulic
+  erosion switched on per body, using Johansen's erosion filter. The operator
+  added aeolian dunes, also switched on per body, from `1 − |snoise|`, with a
+  low-frequency, high-amplitude first octave "to influence the silhouette". And
+  analytic derivatives at every level (invariant 8). Applied in 2a, 4a, 4b,
+  5b, 6a, 6c and 7a.
+- **Q5:** the field is unit-radius and the body transform scales it (D3).
+- **Q6:** the docked view is presentation only. The station stands on its
+  parent planet at a direction derived from its key. The pad waits (7c).
+- **Q7:** invariant 6 is bitwise on one machine and within tolerance across
+  machines.
+- **Q8:** no asteroid belts in this campaign.
+- **Q9:** Asura is MPL-2.0.
 
-  **Recommended: A.** Asteroids are in scope, and the crater rim is the crease
-  case 6c must prove anyway.
-- **Q5. Do biome features scale with the body?** Should a small rock and a large
-  planet of the same biome look like scaled copies (unit-radius field, D3), or
-  keep a world-space feature size (the definition carries a radius)?
-  **Recommended: scale with the body.** It is the tiny-planet style, and it
-  keeps float precision uniform. The target's "(seed, radius, biome
-  parameters)" then loses radius from the Asura definition, and the world
-  radius stays Aetheria's `BodyRadius`.
-- **Q6. What is the docked view?** Stations are generated orbital entities at
-  Lagrange points (`ZoneGenerator.cs:208-215`). `DoDock` today follows the
-  station and looks at its parent planet (`ActionGameManager.cs:863-881`).
-  - A: presentation only. When the station's parent is a rocky planet, the
-    docked camera shows the station asset standing on that planet at a dock
-    direction derived from the station's key. Simulation positions are
-    unchanged. Stations around gas giants or suns, or with no parent, keep
-    today's view.
-  - B: authored dock sites per station.
+### Open
 
-  **Recommended: A.** Also: should the flattened pad under the station ship in
-  7c, or wait for clipping to show it is needed? **Recommended: wait.**
-- **Q7. Invariant 6, "on any machine".** CultMath's HLSL parity is proved on the
-  CPU: the text of the mirror is compiled as C#. Its own test comment says it
-  "does not prove GPU agreement". Because the field is GPU-only, grids can
-  differ in low bits across GPUs and drivers, and a sample near 0 can flip a
-  quad.
-  - A: reword to "bitwise on one machine; across machines within tolerance.
-    Nothing persisted or networked depends on shape bits."
-  - B: require cross-machine bit equality. That would need a CPU field, which
-    contradicts F1 path A.
+- **Q10. How often do the per-body switches fire?** Zone gen draws `Eroded`
+  and `Aeolian` from the planet's seed (7a). What probabilities should it use,
+  and may they apply to any archetype?
+  - A: independent draws, `Eroded` at 0.25 and `Aeolian` at 0.25, over any
+    archetype, as the target says ("layered over any of these"). Both are
+    `ZoneGenerationSettings` entries.
+  - B: only rock bodies may be eroded or aeolian.
+  - C: tie both to an atmosphere notion that Aetheria does not have yet.
 
-  **Recommended: A.**
-- **Q8. Belt asteroids.** Belts are thousands of instanced meshes from
-  `LowPoly_AsteroidsPack` (`ZoneRenderer.cs:339-363`).
-  - A: this campaign covers `PlanetData` bodies (planets and planetoids) only.
-    Belts get a later cut sized by the 5b/6b benchmark, for example a pool of K
-    Asura rocks per belt, instanced.
-  - B: include belts in Cut 7.
+  **Recommended: A.** It is the ruling's literal reading, and it is tunable as
+  data. C would invent a domain concept, atmospheres, that nobody has asked
+  for. This blocks 7a's draw, not Asura.
+- **Q11. Band-limiting (D9): Self's target amendment, not an operator fork.**
+  Invariant 1 says the field is the only truth. Under D9, each lowering
+  evaluates the same field band-limited to its footprint, so the grid does not
+  alias gullies and crests. Proposed wording: "The field is the only truth; a
+  lowering may band-limit it to what its sample spacing can resolve, and never
+  otherwise alters it." Self decides whether that needs the operator.
+- **Q12. Erosion and invariant 8.** The exact first derivative of the eroded
+  height depends on `∇²h` of every base term:
+  - the gully flow direction, the masks and the fade target all depend on
+    `∇h_base`;
+  - the `sign()` in the gully update is nonsmooth.
 
-  **Recommended: A.** The Jevons ruling makes the benchmark the right gate.
-- **Q9. Licence of the Asura package.** CultMath is MPL-2.0 and Aetheria source
-  is MPL-2.0; the cultlib package is MIT. **Recommended: MPL-2.0,** matching
-  Aetheria and CultMath.
+  Upstream's own analytic derivative treats those as locally constant. Against
+  central differences on the sphere (probe, 4b-iii) it is 15° off at the median
+  and 62° at the 95th percentile. It stays at 13° and 63° with an exact Phacelle
+  gradient, so Phacelle is not the cause.
+  - A: accept upstream's analytic derivative for the erosion term only.
+    - It still involves no finite differences.
+    - Its measured bound is committed as a regression guard.
+    - The non-erosion part of the gradient must still pass the tight check.
+    - Shading on eroded bodies then uses upstream's gradients, which is how the
+      article's own renders are shaded.
+  - B: carry second derivatives (Hessians) through every CultMath primitive
+    and term, so erosion's derivative is exact by the chain rule.
+    - This roughly doubles 2a.
+    - It still leaves the `sign()` nonsmooth.
+    - It is also what the article's curvature feature would need.
+  - C: change the erosion so its masks and flow do not depend on slope. That
+    changes the look upstream was chosen for.
 
-## Findings for Self (target reconciliation; not assigned to a cut)
+  **Recommended: A,** with curvature and second derivatives recorded as out of
+  this campaign. Invariant 8's purpose, analytic gradients with no finite
+  differences, holds. What A gives up is only that the erosion term's gradient
+  matches the finite difference of its height. This blocks nothing until 4b-iii;
+  2a is sized for A.
 
-- **The target's "flat body/icon/gravity-well quads" is half wrong.** `Body` is
-  the `Terrain Mesh` object: `Assets/Models/high-res-sphere.fbx` with
-  `Assets/Materials/Planet.mat` (GlowFade shader). Only `Minimap Icon` (layer 14)
-  and `Gravity Well` are quads (`Planet.prefab:15,43,98,126,254,282`). The
-  main-view stand-in is that sphere, not "the flat icon".
-- **The target's "no scene instantiates it" is half wrong.**
-  - `Planet.prefab` carries a disabled generator.
-  - `PlanetOutpost.prefab` carries an **enabled** one.
-  - `ARPG.unity` runs an enabled `LODHandler`.
-  - `ZoneRenderer.cs:400` assigns random plugin settings per planet with
-    `UnityEngine.Random`.
+## Findings for Self (not assigned to a cut)
 
-  The plugin's meshes never generate in play, because the planet generator is
-  disabled, but it is wired in.
-- **The target's substrate pins** (cultlib 1.0.60, cultmath 0.2.4) are the
-  fire-control line's. Master pins 1.0.59 and 0.2.3
-  (`Packages/manifest.json:54-55`).
-- **An unmerged prior planetary line exists in CultLib:** tag
-  `gamecult-geometry-unity-v0.1.0` and `origin/codex/geometry-*`, dated
-  2026-07-22, with a cube-sphere heightfield, erosion, GPU pages and an
-  `org.gamecult.geometry` Unity package. Its progress doc stops at "Stage 6
-  consumer cutover … Gate pending". Main's `GameCult.Geometry` went another way
-  (isosurface, 2026-08-26). Add it to the target's "Not consumers", so no pass
-  mistakes it for Asura's substrate. Its fate belongs to whoever owns the
-  geometry-ownership migration, not to this campaign.
-- **The target mentions smooth-min bevels and pads,** but CultMath has no smin.
-  Cut 2a fills that gap.
-- **Identity table:** propose a row for "mesh edge (vertex-index pair ≙ grid
-  face) → edge point block, per-edge factor" (D4 and 7c). Its lifecycle matches
-  the tile slot's, its owner is the Asura tile pass, and it is regenerable.
-- **Aetheria's `settings-globals-cut.md` fork B** (`:527-535`) plans to move the
-  plugin's 7 body-settings assets into `Resources`. F2 supersedes that; sweep it.
-- **`ZoneRenderer.cs:497`** rotates `Body` by `PlanetRotationSpeed` per frame,
-  not per second, so planet spin depends on frame rate. It is not Asura's
-  concern; record it as an Aetheria follow-up.
-- **Missing substrate:** the voidbot MCP was unreachable (connection timeout)
-  for this pass, so everything here comes from direct git reads and probes.
+Pass 1's findings that the target has absorbed (verified at `5f0f6bd`):
+- the plugin's wiring (in "Not consumers");
+- the July planetary line (in "Not consumers");
+- the mesh-edge identity row;
+- Q7's wording of invariant 6.
+
+Still open from pass 1:
+- **The target's substrate paragraph** still says "flat body/icon/gravity-well
+  quads". `Body` is `high-res-sphere.fbx` with `Planet.mat`; only
+  `Minimap Icon` and `Gravity Well` are quads
+  (`Planet.prefab:15,43,98,126,254,282`). It still pins cultlib 1.0.60 and
+  cultmath 0.2.4, which are the fire-control line's. Master pins 1.0.59 and
+  0.2.3.
+- **Aetheria's `settings-globals-cut.md` fork B** (`:527-535`) is superseded by
+  F2. Sweep it the day Cut 1 lands.
+- **`ZoneRenderer.cs:497`** spins planets per frame, not per second. This is an
+  Aetheria follow-up.
+
+New in pass 2 (checked against the target at `5f0f6bd`):
+- **Target invariant 3** still names only `cultmath_snoise(float3)`. The field
+  now rests on the whole 2a set: `snoise_grad`, `fbm_grad`, `ridged_grad`,
+  `cellular`, `smin_grad` and `phacelle`.
+- **Target invariant 7** still says "the existing flat planet icon stands in".
+  The stand-in is the `Body` sphere (7b).
+- **Target invariant 8** says "every term is checked against central finite
+  differences away from its known creases". Erosion cannot pass that without
+  second derivatives (probe). Q12 must be ruled before 4b-iii, and the
+  invariant's wording must follow the ruling.
+- **Target invariant 2 wording is too narrow now.** It says "the CPU never
+  evaluates the planet field". Core does evaluate numbers *about* the field:
+  parameters, `A_max`, bounds and band limits. The map's forbidden-writer line
+  draws the boundary: "never values of it". The target may want that sentence.
+- **Shadertoy is unreadable to agents.** `shadertoy.com` returns 403 to
+  automated fetches, so Johansen's original shader text (`wXcfWn`, `t3dyWl`)
+  was not read in this pass. The procedure was read from
+  `lpmitchell/AdvancedTerrainErosion`, whose Phacelle and erosion functions are
+  marked MPL-2.0 and derived from `wXcfWn`, and from the article. If exactness
+  against the original matters, the operator can paste it. This is recorded as
+  missing substrate.
+- **Unity sphere implementations exist upstream of us, and neither fits.**
+  lpmitchell's cube-face blend is the approach the probe rejects (seams, or
+  cross-faded gullies). CultLib's July `spherical_erosion` lerps raw phases
+  across cells, which is not Phacelle. Neither is a source.
+- **voidbot MCP** was unreachable in pass 1. Pass 2 did not retry it; it worked
+  from git, `gh` and probes.

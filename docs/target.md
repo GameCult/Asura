@@ -48,11 +48,12 @@ planet definition (seed, archetype parameters)
    positions back out of the atlas as authority, and nothing writes the field
    from it.
 2. **One implementation of each planet field, in HLSL.** The CPU never evaluates
-   the planet field. Surface nets consumes a grid the GPU sampled, so there is no
+   the planet field. C# computes numbers *about* the field (parameters from the
+   seed, `A_max`, bounds, octave bands) but never values *of* it. Surface nets consumes a grid the GPU sampled, so there is no
    C#/HLSL parity to keep for the field itself. (F1, path A.)
-3. **Noise comes from CultMath** (`cultmath_snoise(float3)`, which already has
-   C#/HLSL parity tests). Asura does not grow its own noise. Missing noise
-   capabilities go into CultMath.
+3. **Noise comes from CultMath:** simplex, fBm, ridged, cellular and Phacelle,
+   each in value-plus-gradient form with C#/HLSL parity tests. Asura does not
+   grow its own noise. Missing noise capabilities go into CultMath.
 4. **Surface nets is a CultLib algorithm.** It is engine-neutral C# in
    `GameCult.Geometry`, beside `CultGeometryIsoSurface.Extract`, and takes the
    same input shape (`float[,,]`, iso value, origin, cell size). Asura is only
@@ -66,7 +67,7 @@ planet definition (seed, archetype parameters)
    across machines (Q7; CultMath's parity is CPU-only).
 7. **Zone generation never builds geometry.** Zone gen writes planet definitions
    only. Asura builds a planet on demand, asynchronously, when it first needs to
-   be seen, and the existing flat planet icon stands in until it's ready. Each
+   be seen, and the existing `Body` sphere (`high-res-sphere.fbx`) stands in until it's ready. Each
    planet's build is independent: no shared mutable state, so builds run in
    parallel. This is the lesson of the Celestial Body plugin, which was abandoned
    because it was too slow to run for many planets during every zone gen and
@@ -215,11 +216,15 @@ Two separate campaigns are queued behind this one:
 
 ## Substrate facts this rests on (mapped 2026-09-25)
 
-- **Aetheria:** mainline `F:\Projects\Aetheria`. Unity `6000.3.24f1`, Built-in
-  RP. CultLib arrives as git UPM packages (`org.gamecult.cultlib` v1.0.60,
-  `org.gamecult.cultmath` `cultmath-unity-v0.2.4`). There is no
-  `GameCult.Geometry` package dependency yet. In-game planets are flat
-  body/icon/gravity-well quads (`ZoneRenderer.cs`, `PlanetObject.cs`).
+- **Aetheria:** Unity `6000.3.24f1`, Built-in RP.
+  - Mainline is `origin/master`, which pins `org.gamecult.cultlib` 1.0.59 and
+    `cultmath-unity-v0.2.3`. The in-flight fire-control line, checked out at
+    `F:\Projects\Aetheria`, pins 1.0.60 and 0.2.4. CultLib arrives as git UPM
+    packages.
+  - There is no `GameCult.Geometry` package dependency yet.
+  - The in-game planet body is `high-res-sphere.fbx` with `Planet.mat`. Only the
+    minimap icon and gravity well are quads (`ZoneRenderer.cs`,
+    `PlanetObject.cs`).
 - **CultLib:** `CultGeometryIsoSurface.Extract` is marching tetrahedra with a
   clean-port provenance file. There is a `gamecult-geometry-unity-v0.1.0` tag,
   but no Geometry DLL in `org.gamecult.cultlib`. There is no Stryker config for
