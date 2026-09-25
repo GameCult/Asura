@@ -120,6 +120,25 @@ Two separate campaigns are queued behind this one:
 - The flow field as the single owner of motion in Aetheria.
 - Microfauna species and resources in the slime-mold scene.
 
+## Deferred paths
+
+- **Dual contouring vertex placement** (discussed 2026-09-25). It gives the same
+  topology and the same `(cell, axis)` names as surface nets; it differs only in
+  where each vertex sits, a QEF fit to the tangent planes at edge crossings
+  instead of the mean of the crossings.
+  - Refinement onto `f = 0` recovers most of the difference. Dual contouring still
+    wins in two places:
+    - at N = 1, where the base vertex is the surface;
+    - at creases, which normal-constrained projection cannot pull patch points
+      onto.
+  - It costs clustered or drifting vertices (clamped to the cell, biased toward
+    the mass point), which means uneven texel density, plus gradient samples at
+    every edge crossing.
+  - Worth it for sharp-featured fields (brush structures, ridged noise), not for
+    smooth planets. It is a later option inside CultLib's mesher behind the same
+    output contract. Do not add a placement-strategy abstraction before a
+    sharp-featured field exists to need it.
+
 ## Substrate facts this rests on (mapped 2026-09-25)
 
 - **Aetheria:** mainline `F:\Projects\Aetheria`. Unity `6000.3.24f1`, Built-in
