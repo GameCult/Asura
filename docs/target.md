@@ -83,8 +83,14 @@ planet definition (seed, radius, biome parameters)
 **Not consumers:**
 - `GameCult.Geometry.Csg`'s `distance(p)` (landed `d84acb6`) serves future
   brush-built structures. Planets do not use it.
-- The third-party "Celestial Body" plugin in Aetheria is unused (no scene
-  instantiates it) and is to be deleted (ruling F2).
+- The third-party "Celestial Body" plugin in Aetheria is to be deleted (ruling
+  F2). No planet in play runs it, but it is still wired in: a disabled generator
+  on `Planet.prefab`, an enabled one on `PlanetOutpost.prefab`, a `LODHandler`
+  in `ARPG.unity`, and `ZoneRenderer.cs:400`. See Cut 1.
+- CultLib's July planetary line is unmerged, and no mainline consumes it: tag
+  `gamecult-geometry-unity-v0.1.0` and the `codex/geometry-*` branches, holding a
+  cube-sphere heightfield with erosion and an `org.gamecult.geometry` package.
+  Asura does not build on it.
 - Aetheria's nebula field (`Volumetric.cginc`) is for later condensed bodies, not
   planets.
 
@@ -100,6 +106,7 @@ row except the first is derived at load time and discarded on unload.
 | Surface-net quad | (planet, cell, axis) | Rebuilt from the grid on load, never persisted | CultLib surface nets |
 | Tile slot | quad id to slot index, in an allocation table | Allocated on load; promoted to a higher level near the dock site; freed on unload | Asura atlas allocator |
 | Tile contents (positions, normals, material) | the slot | Regenerable at any time from field and quad; overwritten on promotion | Asura tile pass. Forbidden writers: anything else |
+| Mesh edge (shared by two quads) | the unordered pair of base vertices | Carries the edge's refined points and its per-edge factor, stored once so both quads read the same memory | Asura tile pass; regenerable |
 | Dock site and station placement | Aetheria station identity | Authored | Aetheria. Asura only answers field queries |
 
 ## Scope boundary
