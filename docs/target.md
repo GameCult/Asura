@@ -146,6 +146,27 @@ Two separate campaigns are queued behind this one:
   during every zone gen, and I wasn't able to parallelize it, so I just let it
   sit there." None of its code is harvested. Its shape ideas (craters, shattered
   bodies, moats) may be rebuilt fresh as field functions.
-- Pending: F1 (field owner and where surface nets runs, now also a throughput
-  question), F3 (planets generated once from a seed), and the build budget (how
-  many planets per zone, how many visible at once).
+- 2026-09-25, budget: "Plenty of bodies in the solar system, but you're usually
+  only close to a few of them. What with our exaggerated scale it could be a few
+  dozen." And the Jevons clause: "if you make it fast enough that I can query it
+  for a hundred new unique asteroids every frame, guess how many unique asteroids
+  are gonna end up in frame." So the target is a throughput curve, not a latency
+  number:
+  - Resolution follows screen size per body. A near planet gets a large grid and
+    tiles. A small asteroid gets a small grid, no tile pass, and face-weighted
+    normals on the bare surface-net mesh.
+  - The measure is bodies per millisecond at each grid size, benchmarked and
+    committed. It is not the latency of one planet.
+- 2026-09-25, F1 (Self's recommendation; the operator raised no objection): path
+  A first.
+  1. The planet field is HLSL only.
+  2. The GPU samples each body's grid, with one batched readback per frame.
+  3. CultLib's C# surface nets runs on worker threads, one body per task.
+
+  The named-quad output is the seam between mesher and tile pass. Path B (surface
+  nets as an HLSL mirror in CultLib, parity-tested, with no readback) slots in
+  behind that seam if the throughput benchmark shows the readback round trip or
+  CPU meshing is the cap.
+- 2026-09-25, F3 (default recorded; no objection): bodies are generated once
+  from their seed. There is no runtime editing in this campaign. Unique bodies
+  are new seeds, not edits.
