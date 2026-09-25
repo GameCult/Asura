@@ -163,6 +163,12 @@ Two separate campaigns are queued behind this one:
     (`HlslMirrorTests`: no `spherical_erosion`).
   - Craters and ice cracks both use cellular noise, which also goes in
     CultMath.
+  - Operator, the same day: "1-abs(snoise(p)) gives nice dune contours."
+    Aeolian dunes are a per-body switch, like erosion, for bodies with an
+    atmosphere (Mars, Titan, Venus). The term is ridged noise, which puts a true
+    crease on every crest, so dunes are a live test case for crease snapping
+    (Cut 6c). Lee/windward asymmetry via a wind-aligned domain warp is optional
+    tuning.
 - **Q5–Q9:** Self's recommendations stand as defaults; the operator did not
   object.
   - Q5: the field is unit-radius and the body transform scales it.
