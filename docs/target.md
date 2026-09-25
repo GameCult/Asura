@@ -135,9 +135,15 @@ Two separate campaigns are queued behind this one:
     the mass point), which means uneven texel density, plus gradient samples at
     every edge crossing.
   - Worth it for sharp-featured fields (brush structures, ridged noise), not for
-    smooth planets. It is a later option inside CultLib's mesher behind the same
-    output contract. Do not add a placement-strategy abstraction before a
-    sharp-featured field exists to need it.
+    smooth planets.
+  - **Superseded the same day** by crease snapping in the tile pass. There, after
+    refinement, each patch point samples gradients on a fixed world-space
+    stencil. Where the gradients split, a small QEF over the tangent planes they
+    define snaps the point onto the crease or corner, clamped against folds.
+    Because patch corners are the base vertices, N = 1 gets dual-contouring-sharp
+    corners too. The mesher therefore stays pure surface nets, and no dual
+    contouring option is planned in CultLib. Prior art: Kobbelt et al. 2001,
+    Ju et al. 2002. Implemented fresh.
 
 ## Substrate facts this rests on (mapped 2026-09-25)
 
