@@ -66,8 +66,24 @@ Progress (Self keeps this current):
   (`29e50ad..1add078`, 8 commits, all building).
   - 184 of 184 CultMath tests pass. FXC `cs_5_0` compiles a kernel using both
     new functions. dxc was not run: the tool is missing on Starfire.
-  - Soul pass 1 is running. Suspects: the tolerance change in `08b0dce`, the
-    deleted F2 guard, and whether a 3×3×3 search is complete for F2.
+  - Soul pass 1 held that every named gradient mutant dies and that the smin
+    gradient is exact (6.4e-10 against double central differences). It found:
+    - `edge.w`'s value is unpinned by any behavioural test;
+    - the struct mirror compares by position, not by name (H2 and H3 survive);
+    - F2 = 0 gives NaN from about |p| ≥ 1e7 (the deleted guard *was*
+      reachable);
+    - `id` equals the jitter's x component;
+    - the tolerance is 300× float noise (∇F2 × 1.01 survives);
+    - the 3×3×3 search misses F2 on 0.002% of points, and the test oracle
+      shares the defect;
+    - `id` can reach 1.0.
+
+    Fix batch 1 is out.
+  - Stopgap defect, for the Eureka skill and Idunn's verify campaign:
+    `ygg-verify.sh` names mirrors after the checkout directory's basename, so
+    scratch worktrees named `wt` share one bare mirror across campaigns
+    (`~/eureka-verify/repos/wt.git`, from 2026-09-23). Name mirrors by repo
+    identity, not path.
   - **Budget scar:** Hands ran to about 340k tokens against an estimate of
     ~150k. Split later CultMath cuts finer (e.g. one primitive family per
     Hands).
