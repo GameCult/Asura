@@ -8,7 +8,7 @@ stale.
 
 Rocky planets for Aetheria, in the style of a "tiny planet" photo: the scale is
 deliberately distorted, so a desert planet's dunes are big enough to shape its
-silhouette and its biome reads from orbit. Planets are seen from space. There is
+silhouette and its character reads from orbit. Planets are seen from space. There is
 also one close-up view when docked, showing an oversized station asset sitting on
 the surface. There is no landing and no surface streaming.
 
@@ -18,13 +18,13 @@ are not in scope.
 ## The machine
 
 ```text
-planet definition (seed, radius, biome parameters)
-  -> planet field  f(p) = sphere + large-scale biome displacement + noise      [HLSL]
+planet definition (seed, archetype parameters)
+  -> planet field  f(p) = |p| - (1 + h(p/|p|)), value + analytic gradient    [HLSL]
   -> sampled grid over the planet's bounds                                      [GPU -> readback]
   -> surface nets: one vertex per crossed cell, one quad per crossed grid edge  [C#, CultLib]
   -> tile slot per quad in an atlas
   -> tile pass: per quad, an N x N grid of points refined onto f = 0,          [HLSL compute]
-     with gradient normals and biome material
+     with gradient normals and archetype material
   -> patches rendered from the tiles (vertex positions read from the atlas)     [Built-in RP shader]
 ```
 
@@ -32,13 +32,13 @@ planet definition (seed, radius, biome parameters)
   the silhouette are resolved by the surface-net grid. The tile pass only refines
   detail smaller than one grid cell. Tiles hold real displaced positions, not
   normal-map illusions, because the silhouette is the point.
-- **Hard-surface look:** normals come from the field gradient per texel. Brush
-  seams get a small smooth-min bevel. Distant or unloaded quads fall back to
-  face-weighted normals on the bare surface-net mesh.
+- **Hard-surface look:** normals come from the field's analytic gradient, and
+  creases are snapped sharp in the tile pass (Cut 6c). Quads whose tiles are
+  not ready yet show face-weighted normals on the bare surface-net mesh.
 - **Docked view:** the quads near the dock site get higher tile resolution. The
   station asset sits on a field query (height and normal along a direction). An
   optional flattened pad under it is blended in with a smooth-min.
-- **Props** (oversized trees, rocks), chosen per biome and scattered along
+- **Props** (oversized trees, rocks), chosen per archetype and scattered along
   normals, come in a later cut on top of this one.
 
 ## Invariants
@@ -49,7 +49,7 @@ planet definition (seed, radius, biome parameters)
    from it.
 2. **One implementation of each planet field, in HLSL.** The CPU never evaluates
    the planet field. Surface nets consumes a grid the GPU sampled, so there is no
-   C#/HLSL parity to keep for the field itself. (Pending fork F1.)
+   C#/HLSL parity to keep for the field itself. (F1, path A.)
 3. **Noise comes from CultMath** (`cultmath_snoise(float3)`, which already has
    C#/HLSL parity tests). Asura does not grow its own noise. Missing noise
    capabilities go into CultMath.
@@ -57,10 +57,10 @@ planet definition (seed, radius, biome parameters)
    `GameCult.Geometry`, beside `CultGeometryIsoSurface.Extract`, and takes the
    same input shape (`float[,,]`, iso value, origin, cell size). Asura is only
    the Unity-side consumer.
-5. **Quads are named by the grid edge they cross,** `(cell, axis)`. Two quads
-   sharing an edge compute that edge's refined points identically: same corners,
-   same parameterisation, same shader. So the surface is watertight wherever
-   neighbouring quads use the same tile level.
+5. **Quads are named by the grid edge they cross,** `(cell, axis)`. Refined
+   points are stored once per base vertex, once per mesh edge and once per quad
+   interior. Neighbouring quads therefore read the same memory for their shared
+   edge, and the surface is watertight by construction (cut map D4).
 6. **Reproducible from the seed.** The same definition gives the same field, the
    same quads and the same tiles: bitwise on one machine, and within tolerance
    across machines (Q7; CultMath's parity is CPU-only).
@@ -111,7 +111,7 @@ row except the first is derived at load time and discarded on unload.
 
 | Kind | What names it | What happens to it over time | Who decides |
 | --- | --- | --- | --- |
-| Planet definition (seed, radius, biome parameters) | Aetheria's planet or content identity | Authored or generated with the zone; immutable for a given seed | Aetheria content |
+| Planet definition (seed, archetype parameters) | Aetheria's planet or content identity | Authored or generated with the zone; immutable for a given seed | Aetheria content |
 | Sampled field grid | (planet, grid resolution) | Sampled on planet load, read back, dropped once meshed | Asura field kernel |
 | Surface-net quad | (planet, cell, axis) | Rebuilt from the grid on load, never persisted | CultLib surface nets |
 | Tile slot | quad id to slot index, in an allocation table | Allocated on load; promoted to a higher level near the dock site; freed on unload | Asura atlas allocator |
