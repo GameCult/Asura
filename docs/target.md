@@ -64,6 +64,15 @@ planet definition (seed, radius, biome parameters)
 6. **Reproducible from the seed.** The same definition gives the same field, the
    same quads and the same tiles: bitwise on one machine, and within tolerance
    across machines (Q7; CultMath's parity is CPU-only).
+8. **Analytic derivatives flow through every level** (operator, 2026-09-25:
+   "make sure we have analytic derivatives flowing down every level"). Every
+   field term returns its value and its analytic gradient together: CultMath
+   primitives, archetype terms, the erosion filter, and the sphere composition
+   `∇f = u − (I − uuᵀ)∇h / |p|`. Composition applies the chain rule. The field
+   contains no finite differences. Every consumer reads these gradients:
+   Newton refinement, normals, crease detection, and the erosion input. Every
+   term is checked against central finite differences away from its known
+   creases.
 7. **Zone generation never builds geometry.** Zone gen writes planet definitions
    only. Asura builds a planet on demand, asynchronously, when it first needs to
    be seen, and the existing flat planet icon stands in until it's ready. Each
