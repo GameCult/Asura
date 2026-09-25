@@ -36,23 +36,28 @@ Later operator additions the same day:
   level".
 
 Progress (Self keeps this current):
-- **Cut 2:** Hands landed it on CultLib `hands/asura-surface-nets`
-  (`29e50ad..659e3dd`, 6 commits, all building). Surface-nets tests pass.
-  Stryker (`--since`, which fell back to the whole glob on this first config)
-  left 20 survivors: in the cut's own files, one float-threshold flip and three
-  claimed vstest false survivors; the rest are in untouched files.
-  - Reported by Hands as pre-existing: 7 `GeometryDocumentTests` fail at
-    `29e50ad` (`CultGeometryBuildRequest.DomainKey` reference not walkable by
-    `CultDocumentRegistry.Refresh`). Soul is diagnosing the cause and owner.
-  - Soul pass 1 found real defects:
-    - F1: Stryker never mutated `Extract`, because unassigned locals turned all
-      98 mutants into compile errors.
-    - F4: orientation had two authorities, which split on degenerate quads.
-    - F3: the float guard made answers worse.
-    - F2: the survivor triage was wrong.
-    - F6, F7, F8: minor.
+- **Cut 2: CLOSED and landed** on CultLib `main` at `4163001` (a `--no-ff`
+  merge of `hands/asura-surface-nets`, `29e50ad..d64de1b`; the merged tree
+  equals the one Soul verified).
+  - Three Soul passes. Pass 1:
+    - Stryker never mutated `Extract`;
+    - there were two orientation authorities;
+    - a float guard gave answers worse than exact;
+    - the survivor triage was wrong.
 
-    Fix batch 1 is out to a fresh Hands.
+    Pass 2: two false doc claims and weak `Equals` and validation. Pass 3:
+    promises confirmed; byte-identical output over 31 fixtures across the
+    closing refactor.
+  - Final Stryker on the scoped diff: 96.69%. SurfaceNets has 6 survivors, all
+    equivalent (5 exception-message strings, plus `<= 0` on a ±1 table);
+    QuadMesh and QuadNormals have 0.
+  - Follow-ups:
+    - (a) `docs/mutation-testing.md:94-119` describes the deleted
+      `TryGetOtherEndpoint` in the present tense. Mark it as history.
+    - (b) Soul pass 3 left two `KEEP=1` work directories on Yggdrasil
+      (`~/eureka-verify/work/CultLib-d64de1b69d-*`), which are root-owned from
+      the container. Removing them needs the operator or a sudo-capable
+      session.
   - The 7 `GeometryDocumentsTests` failures: CultLib `e420410` (CultNet
     selection, cut 1, commit 0) added registry check D11, which refuses
     `[CultReference]` on `string` members. Geometry has three of them
