@@ -64,6 +64,13 @@ planet definition (seed, radius, biome parameters)
 6. **Reproducible from the seed.** The same definition gives the same field, the
    same quads and the same tiles: bitwise on one machine, and within tolerance
    across machines (Q7; CultMath's parity is CPU-only).
+7. **Zone generation never builds geometry.** Zone gen writes planet definitions
+   only. Asura builds a planet on demand, asynchronously, when it first needs to
+   be seen, and the existing flat planet icon stands in until it's ready. Each
+   planet's build is independent: no shared mutable state, so builds run in
+   parallel. This is the lesson of the Celestial Body plugin, which was abandoned
+   because it was too slow to run for many planets during every zone gen and
+   could not be parallelised.
 8. **Analytic derivatives flow through every level** (operator, 2026-09-25:
    "make sure we have analytic derivatives flowing down every level"). Every
    field term returns its value and its analytic gradient together: CultMath
@@ -73,13 +80,6 @@ planet definition (seed, radius, biome parameters)
    Newton refinement, normals, crease detection, and the erosion input. Every
    term is checked against central finite differences away from its known
    creases.
-7. **Zone generation never builds geometry.** Zone gen writes planet definitions
-   only. Asura builds a planet on demand, asynchronously, when it first needs to
-   be seen, and the existing flat planet icon stands in until it's ready. Each
-   planet's build is independent: no shared mutable state, so builds run in
-   parallel. This is the lesson of the Celestial Body plugin, which was abandoned
-   because it was too slow to run for many planets during every zone gen and
-   could not be parallelised.
 
 ## Canonical implementations and consumers
 
