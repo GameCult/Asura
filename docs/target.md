@@ -152,9 +152,19 @@ Two separate campaigns are queued behind this one:
   for a hundred new unique asteroids every frame, guess how many unique asteroids
   are gonna end up in frame." So the target is a throughput curve, not a latency
   number:
-  - Resolution follows screen size per body. A near planet gets a large grid and
-    tiles. A small asteroid gets a small grid, no tile pass, and face-weighted
-    normals on the bare surface-net mesh.
+  - Resolution follows screen size per body. A near planet gets a large grid; a
+    rock gets a small one.
+  - Refined the same day: every body gets tiles, and the detail comes "from
+    baked textures and displacement". A rock's base mesh is "a couple hundred
+    polygons … maximum", which means grids of about 8³–12³ and roughly 100–300
+    quads. Tiles run in one of two modes, chosen per body by screen size:
+    - texture-only: albedo, material and a gradient normal baked per quad, over
+      the bare quads;
+    - displaced: the tile also stores refined positions, and the vertex shader
+      expands each quad into a patch, for bodies whose silhouette shows.
+
+    Face-weighted normals are only the fallback while a body's tiles aren't
+    ready.
   - The measure is bodies per millisecond at each grid size, benchmarked and
     committed. It is not the latency of one planet.
 - 2026-09-25, F1 (Self's recommendation; the operator raised no objection): path
