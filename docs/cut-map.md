@@ -604,6 +604,20 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     `29e50ad..main`. It is small, so Self briefs it separately.
   - Both `CultMath.hlsl` copies stay one blob; there is no pinned hash, since
     2a-i changed it.
+- **2a-ii-a status (2026-09-26):**
+  - Hands landed `268e0ef..c9dabbe`: 201 of 201 tests pass, and FXC and dxc
+    both compile. dxc is present on Starfire, under Windows Kits
+    10.0.26100.0.
+  - It ran to ~340k tokens against a ~180k estimate. It yielded twice on
+    background jobs despite the brief, which makes 3 of 5 Hands passes.
+  - `octaves` is clamped to [0,16] because the mirror test drives `int`
+    parameters across all of int32.
+  - Stryker did not complete. Stryker's `--since` resolves paths against the
+    main checkout from inside a linked worktree and ignores every mutant, so
+    run it from a plain clone.
+  - Soul pass 1 is out. It owns the Stryker run, plus a hypothesis: the r²=0.6
+    kernel of the existing `snoise` gives real value discontinuities at
+    simplex boundaries, which the property test's consistency filter hides.
 - **Brief rules carried from 2a-i:**
   - Run verification detached, with a log that Hands polls in the
     foreground; never as a background shell task.
