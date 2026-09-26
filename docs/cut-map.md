@@ -83,7 +83,34 @@ Progress (Self keeps this current):
       shares the defect;
     - `id` can reach 1.0.
 
-    Fix batch 1 is out.
+    Soul pass 2 found the proof of the search radius wrong, the 3×3×3 search
+    inexact (the search moved to 5×5×5, pruned, exact), non-uniform jitter from
+    hashing float bits, the HLSL mirror unpinned, and fragile tolerances.
+    The closing batch ends at `05ca826`: 193 of 193 tests pass, and 4 of 4 HLSL
+    mutants die against the mirror test.
+  - Soul pass 3 on `e739ff1..05ca826` confirmed the code and tests. Stryker
+    (`--since:29e50ad`, full-file because HLSL and docs changed) scored 76.09%
+    over the library, with 0 survivors in `smin_grad`, `cellular` and
+    `cellular_unit`. The true survivors are the 8 equivalents from pass 2 (the
+    arithmetic of the prune bound, the redundant `continue`, and `>>>` on
+    `uint`). The pass found two false documentation claims from the closing
+    batch:
+    - The F6 proof says the bound is 2.5 at m=½; it is 2.75.
+    - A chi-square figure of 203.8 for float-bit hashing does not reproduce
+      (Soul got 7.7–30.9 against a critical value of 37.7). The cited test also
+      never calls `cellular()`: the oracle and mirror tests pin the integer hash
+      instead.
+
+    A doc-only fix batch is out. 2a-i closes when that fix lands, and then
+    merges to `main`.
+  - Detection floor, recorded rather than chased: the cellular gradient
+    tolerance is 1.3e-3, about 4× the measured central-difference error. A
+    per-component additive gradient error of ~1e-3, or a multiplicative one of
+    ≤0.1%, survives.
+  - Nervous-system finding: 10 of the 21 `Timeout` mutants in cellular were
+    false timeouts from the 4-CPU container. Rerun alone, each dies in 4–6 s.
+    Do not gate on the Timeout bucket from `ygg-verify.sh` runs; triage it by
+    rerunning.
   - Stopgap defect, for the Eureka skill and Idunn's verify campaign:
     `ygg-verify.sh` names mirrors after the checkout directory's basename, so
     scratch worktrees named `wt` share one bare mirror across campaigns
@@ -107,7 +134,8 @@ Answered 2026-09-25 (see target, "Rulings on the second map pass"):
 - Q12: A. Erosion keeps upstream's analytic derivative, checked against a
   committed error bound. There are no second derivatives this campaign.
 
-Nothing is open. Cuts 1 and 7 wait on fire-control merging to Aetheria master.
+Open: Q13 (the Geometry `[CultReference]` strings against D11, above), which
+blocks Cut 3. Cuts 1 and 7 wait on fire-control merging to Aetheria master.
 The Q10–Q12 texts at the end are kept as history; these answers supersede them.
 
 ## Cut order
