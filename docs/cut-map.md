@@ -101,8 +101,9 @@ Progress (Self keeps this current):
       never calls `cellular()`: the oracle and mirror tests pin the integer hash
       instead.
 
-    A doc-only fix batch is out. 2a-i closes when that fix lands, and then
-    merges to `main`.
+    The doc-only fix is at `4922438`. **Cut 2a-i: CLOSED and landed** on CultLib
+    `main` at `268e0ef`, a `--no-ff` merge whose cultmath tree equals the
+    branch. 193 of 193 tests pass on the merged tree.
   - Detection floor, recorded rather than chased: the cellular gradient
     tolerance is 1.3e-3, about 4× the measured central-difference error. A
     per-component additive gradient error of ~1e-3, or a multiplicative one of
@@ -431,8 +432,8 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
 
 - **Repo/branch:** CultLib, `hands/cultmath-asura-noise`, from `origin/main`
   `29e50ad`, in its own worktree. Do not use Cut 2's
-  `F:\Projects\CultLib-asura-surface-nets`. 2a-ii continues on the same branch
-  after 2a-i lands. One release, `cultmath-unity-v0.3.0`, at the end of 2a-ii:
+  `F:\Projects\CultLib-asura-surface-nets`. 2a-i landed at `268e0ef`; 2a-ii's
+  parts branch from `main` (see "Split after 2a-i's overrun" below). One release, `cultmath-unity-v0.3.0`, at the end of 2a-ii:
   it is additive, so a minor bump per `docs/semver-policy.md`, and it gets a Soul
   pass before the tag. There is one release rather than two because every
   CultMath release forces a matching `org.gamecult.cultlib` release (Cut 3's
@@ -587,7 +588,32 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
   - Starfire: FXC `cs_5_0` compile of a kernel calling each new function. This
     extends this map's FXC probe, and FXC is Unity's D3D11 compiler.
   - Also `dxc -T lib_6_3 -HV 2021` per `design.md`.
-- **Hands budget:** ~200k tokens, including the release.
+- **Split after 2a-i's overrun (Self, 2026-09-26).** 2a-i was estimated at
+  ~150k tokens and ran to ~340k, then needed three Soul passes. 2a-ii
+  therefore runs as three parts, each on its own branch from CultLib `main`
+  (`268e0ef` for the first), each with its own Soul loop, merged `--no-ff`
+  when closed:
+  - **2a-ii-a**, branch `hands/cultmath-snoise-grad`: `snoise_grad`,
+    `fbm_grad` and `ridged_grad`, with their rules and the shared
+    invariant-8 property harness. Budget ~180k tokens.
+  - **2a-ii-b**, branch `hands/cultmath-phacelle`: `phacelle` and `CultPhasor`,
+    with the exact gradient, exact pruning and their rules. It reuses the
+    struct-mirror extension from 2a-i. Budget ~200k tokens.
+  - **2a-ii-c**: the `cultmath-unity-v0.3.0` release (with its coupled
+    `org.gamecult.cultlib` release, Cut 3's rule), after a Soul pass over
+    `29e50ad..main`. It is small, so Self briefs it separately.
+  - Both `CultMath.hlsl` copies stay one blob; there is no pinned hash, since
+    2a-i changed it.
+- **Brief rules carried from 2a-i:**
+  - Run verification detached, with a log that Hands polls in the
+    foreground; never as a background shell task.
+  - Stryker `Timeout` mutants from the 4-CPU Yggdrasil container are
+    unreliable: rerun each alone before calling it a hang.
+  - A number stated in code comments or `design.md` must come from a committed
+    test or a probe the report reproduces. 2a-i shipped an unreproducible
+    chi-square figure.
+  - A Soul probe that is the only defence of a rule gets committed by the
+    next Hands pass.
 - **Ledger estimate (2a total):** +~250 C#, +~220 HLSL, +~350 test lines, and 2
   notice entries.
 
