@@ -618,6 +618,37 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
   - Soul pass 1 is out. It owns the Stryker run, plus a hypothesis: the r²=0.6
     kernel of the existing `snoise` gives real value discontinuities at
     simplex boundaries, which the property test's consistency filter hides.
+- **Soul pass on 2a-ii-a, 2026-09-29 (Opus). Do not merge yet; an operator fork is open.**
+  - **F1, CONFIRMED, high: CultMath's existing `snoise(float3)` has real value
+    discontinuities at simplex cell boundaries** (`math.cs:645`, kernel `0.6 - d²`). With
+    r²=0.6, a lattice vertex that is not one of the four summed corners can lie inside the
+    kernel. 22% of points have one. Across 3,383 bisected boundary crossings the max value
+    jump is 5.2e-3 and the max gradient jump 0.26, against 2.2e-6 at r²=0.5. A straddling
+    central difference grows as 1/eps. Upstream (stegu/webgl-noise) fixed this as "an
+    age-old bug" by moving to 0.5 / 105. The new gradients are correct within each cell
+    and inherit the jumps, so Asura's normals and erosion would show seams at every
+    octave. The committed harness cannot see it, because its stencils rarely straddle a
+    seam. `NoiseGradTests.cs:23` misdiagnosed the spike as a "float32 fluke".
+  - **Operator fork Q-N1:**
+    - (a) Move `snoise` to r²=0.5 (the upstream fix). This changes a public function's
+      values, so it needs a semver decision.
+    - (b) Fix only `snoise_grad`, which breaks the spec rule that `.w` equals `snoise`.
+    - **Consumer found by Self:** Aetheria's gameplay calls CultMath `snoise` directly
+      (`Settings.cs:73`, `Environment.cs`, `GlobalData.cs`), so (a) changes Aetheria's
+      generated values too.
+    - **Self recommends (a)** with a minor version bump and the change named in the
+      release notes. A seam in the value function is a defect for every consumer.
+  - F2: false provenance at `math.cs:701`. The 0.6/42 constants are upstream's old buggy
+    ones, not a "second-order-artifact-reduced" variant.
+  - F3: numbers in the test comments are unreproducible or false (floors, the "similar or
+    tighter" claim, 20,000 vs 5,000 points). The ridged tolerance could tighten to about
+    0.05.
+  - F4: the ridged compounding test's loop has no attempt cap, so a mutant hangs instead
+    of failing.
+  - Stryker, focused on the new functions: 103 mutants, 0 survivors. Two genuine hangs
+    (`i++` to `i--` at `:789` and `:816`) are covered by F4's kind of fix. 201/201 tests.
+  - **Probe to commit after the ruling:** march random lines until the simplex cell changes,
+    bisect, and assert value and gradient continuity across 400 seams.
 - **Brief rules carried from 2a-i:**
   - Run verification detached, with a log that Hands polls in the
     foreground; never as a background shell task.
