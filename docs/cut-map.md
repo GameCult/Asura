@@ -633,6 +633,15 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     `snoise` moves to upstream's fixed kernel. It ships as a minor version bump, with the value
     change named in the release notes. Aetheria's generated values change when it next bumps
     its CultMath pin.
+  - **Status, 2026-09-30.** Hands landed the fix on CultLib `hands/cultmath-snoise-grad` (`0a5f4bf`),
+    following upstream stegu/webgl-noise `22434e04d7`: seam fix `21d9fe23d7` (r² 0.6→0.5), scale
+    `ff3b5d34ea` (105), permutation `a3e6d57095` (+10). The continuity probe is red on the old kernel
+    and green on the new one. 202 of 202 CultMath tests pass. FXC and DXC compile both HLSL copies.
+    Stryker cannot instrument the `float3` arithmetic, so the tests are pinned by hand mutations.
+    A narrow Soul pass is running.
+  - **Follow-up ruling, 2026-09-30: 2D follows upstream too.** The +10 permutation is shared with the
+    2D `snoise`, whose kernel and scale already matched upstream, so 2D values shift once, in the same
+    release. There is one permutation and no second permute helper.
   - *The question as asked:*
     - (a) Move `snoise` to r²=0.5 (the upstream fix). This changes a public function's
       values, so it needs a semver decision.
