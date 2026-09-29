@@ -639,6 +639,22 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     and green on the new one. 202 of 202 CultMath tests pass. FXC and DXC compile both HLSL copies.
     Stryker cannot instrument the `float3` arithmetic, so the tests are pinned by hand mutations.
     A narrow Soul pass is running.
+  - **Merged to CultLib main, 2026-09-30** (`65311c9`) after Soul found no defect.
+    - An independent port of upstream matches the new code in 2D and 3D, and the goldens were confirmed
+      independently.
+    - Value jump is 2.2e-6 over 20k crossings. The gradient's finite-difference error is 9.7e-6.
+    - Every hand mutant was killed. CultMath has 248 tests and Caching 272, all green on the merged tree.
+    - **Release follow-ups** for the next CultMath release, which carries this, the BLS solver and Asura:
+      - rebuild the Unity `CultMath.dll`, which the build script enforces;
+      - add a `CHANGELOG` entry for the public value change;
+      - pin the two HLSL copies equal, or delete one;
+      - optionally, a small Starfire GPU compute check of `cultmath_snoise` against C#, since
+        float-decided gradient ties could differ under FMA.
+    - **Aetheria obligation at its pin bump:** Aetheria's shaders carry their own old noise
+      (`Assets/Plugins/GPU Noise/SimplexNoise{2D,3D,Grad2D,Grad3D}.cginc`, used by `GalaxyMap`, `Clouds`,
+      `Background` and `SimplexBrush`). After the bump, the CPU fBm in `Settings.cs` and the GPU fBm in
+      `GalaxyMap.shader` disagree. The coherent fix is for those shaders to include CultMath's HLSL and
+      delete the copies. AetheriaEve's `GalaxyMap.shader` has the same problem.
   - **Follow-up ruling, 2026-09-30: 2D follows upstream too.** The +10 permutation is shared with the
     2D `snoise`, whose kernel and scale already matched upstream, so 2D values shift once, in the same
     release. There is one permutation and no second permute helper.
