@@ -629,7 +629,11 @@ These apply across cuts. Self may overrule any of them. None is a product fork.
     and inherit the jumps, so Asura's normals and erosion would show seams at every
     octave. The committed harness cannot see it, because its stencils rarely straddle a
     seam. `NoiseGradTests.cs:23` misdiagnosed the spike as a "float32 fluke".
-  - **Operator fork Q-N1:**
+  - **Operator fork Q-N1: RULED (a) by the operator, 2026-09-30 ("fix snoise, go with (a)").**
+    `snoise` moves to upstream's fixed kernel. It ships as a minor version bump, with the value
+    change named in the release notes. Aetheria's generated values change when it next bumps
+    its CultMath pin.
+  - *The question as asked:*
     - (a) Move `snoise` to r²=0.5 (the upstream fix). This changes a public function's
       values, so it needs a semver decision.
     - (b) Fix only `snoise_grad`, which breaks the spec rule that `.w` equals `snoise`.
