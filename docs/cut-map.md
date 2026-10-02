@@ -66,8 +66,8 @@ Progress (Self keeps this current):
     and fail at `e420410`. CultLib `a6720b62` (2026-09-30, merging
     `0479304d..9ea134ac`) makes the three members `CultRecordRef<T>`; the commit
     states the wire bytes are unchanged. **Q13 ruled by the operator, 2026-10-02:
-    "a6720b62 answers Q13".** A `GeometryDocumentsTests` run on `main` is queued
-    on Yggdrasil; its result gates Cut 3.
+    "a6720b62 answers Q13".** `GeometryDocumentTests` is green on CultLib `f7d4b639`
+    (Yggdrasil, 2026-10-02: 75 of 75 in `GameCult.Geometry.Tests`).
   - Follow-ups outside Asura: `CultGeometryIsoSurface.cs:148` has the same
     worse-than-exact float guard, and IsoSurface also accepts non-finite samples.
     The GameCult.Geometry owner should mirror Cut 2's fixes there.
@@ -147,8 +147,8 @@ Answered 2026-09-25 (see target, "Rulings on the second map pass"):
 - Q12: A. Erosion keeps upstream's analytic derivative, checked against a
   committed error bound. There are no second derivatives this campaign.
 
-Q13 is ruled (2026-10-02: `a6720b62` answers it). Cut 3's remaining gate is a
-green `GeometryDocumentsTests` run on `main`. Cuts 1 and 7 wait on fire-control merging to Aetheria master.
+Q13 is ruled (2026-10-02: `a6720b62` answers it) and Geometry's tests are green
+on `main`. Cut 3 is unblocked. Cuts 1 and 7 wait on fire-control merging to Aetheria master.
 The Q10–Q12 texts at the end are kept as history; these answers supersede them.
 
 ## Cut order
