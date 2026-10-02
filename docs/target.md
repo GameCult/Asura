@@ -237,6 +237,20 @@ Two separate campaigns are queued behind this one:
     contouring option is planned in CultLib. Prior art: Kobbelt et al. 2001,
     Ju et al. 2002. Implemented fresh.
 
+- **Tangential relaxation in the tile pass** (discussed 2026-10-02). Newton
+  refinement moves points only along the normal, so they can cluster or drift.
+  Relaxation is a few rounds of three steps: even out neighbours in the tangent
+  plane, re-project onto `f = 0`, and crease-snap again. This is particle-based
+  implicit-surface sampling (Witkin and Heckbert 1994).
+  - Points on tile edges may move only along their edge, using data that both
+    tiles share, so the surface stays watertight (Cut 6b).
+  - It is a candidate Cut 6d, earned only if 6b or 6c show uneven texel density
+    or poor snapping.
+  - Thin authored bevels need no new machinery. A point snapped onto a bevel
+    takes the bevel's blended gradient, which gives weighted-normal shading over
+    one patch cell. Whether a bevel snaps or stays smooth geometry depends on
+    the crease stencil's size relative to the bevel's radius.
+
 ## Substrate facts this rests on (mapped 2026-09-25)
 
 - **Aetheria:** Unity `6000.3.24f1`, Built-in RP.
