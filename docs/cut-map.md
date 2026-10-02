@@ -1,7 +1,8 @@
 # Asura: cut map
 
-Status: cut map, Imagination pass 2, 2026-09-25. Cut 2 is being executed by
-Hands in `F:\Projects\CultLib-asura-surface-nets`. Nothing has landed yet.
+Status: cut map, Imagination pass 2, 2026-09-25. Cuts 2, 2a-i, 2a-ii-a and
+2a-ii-b have landed on CultLib `main`; Progress below records each. 2a-ii-c (the
+CultMath release) has not been cut.
 `docs/target.md` owns the ends. This document owns the means. Where this map and
 the Body disagree, the Body wins and this map is stale. The map lives on `main`
 of `GameCult/Asura`.
@@ -62,8 +63,10 @@ Progress (Self keeps this current):
     selection, cut 1, commit 0) added registry check D11, which refuses
     `[CultReference]` on `string` members. Geometry has three of them
     (`CultGeometryDocuments.cs:156, :231, :316`). The tests passed at `b3d9cf7`
-    and fail at `e420410`. **This blocks Cut 3**, because Unity consumers would
-    throw on registering Geometry documents. It is an operator question (Q13).
+    and fail at `e420410`. CultLib `a6720b62` (2026-09-30, merging
+    `0479304d..9ea134ac`) makes the three members `CultRecordRef<T>`; the commit
+    states the wire bytes are unchanged. Not recorded: an operator ruling on Q13,
+    or a green `GeometryDocumentsTests` run on the merged tree.
   - Follow-ups outside Asura: `CultGeometryIsoSurface.cs:148` has the same
     worse-than-exact float guard, and IsoSurface also accepts non-finite samples.
     The GameCult.Geometry owner should mirror Cut 2's fixes there.
@@ -128,6 +131,14 @@ Progress (Self keeps this current):
     ~150k. Split later CultMath cuts finer (e.g. one primitive family per
     Hands).
 
+- **Cut 2a-ii-a (snoise gradient + seam fix):** landed on CultLib `main` at
+  `65311c9` (detail under 2a-ii below).
+- **Cut 2a-ii-b (Phacelle):** landed on CultLib `main` at `15c6a7e2`, merging
+  `hands/cultmath-phacelle` (`7904e15e..0acc3728`); per the merge message, Soul
+  found no correctness defect and the MPL-2.0 port lives in its own MPL-headed
+  files. CultPhasor caching support merged at `0dc3b917`. No `cultmath-v0.3.0`
+  tag exists; the release is 2a-ii-c.
+
 Answered 2026-09-25 (see target, "Rulings on the second map pass"):
 - Q10: independent 0.25 draws in zone-gen settings. Galaxy-driven variance is a
   later campaign.
@@ -135,8 +146,9 @@ Answered 2026-09-25 (see target, "Rulings on the second map pass"):
 - Q12: A. Erosion keeps upstream's analytic derivative, checked against a
   committed error bound. There are no second derivatives this campaign.
 
-Open: Q13 (the Geometry `[CultReference]` strings against D11, above), which
-blocks Cut 3. Cuts 1 and 7 wait on fire-control merging to Aetheria master.
+Open: whether the operator accepts `a6720b62` as Q13's answer and a green
+`GeometryDocumentsTests` run on `main` is recorded; until then, Cut 3's gate
+is unconfirmed. Cuts 1 and 7 wait on fire-control merging to Aetheria master.
 The Q10–Q12 texts at the end are kept as history; these answers supersede them.
 
 ## Cut order

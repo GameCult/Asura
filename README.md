@@ -7,4 +7,4 @@ its own tile, and a compute pass fills every tile with detail refined onto the
 same function, so the displaced surface stays true to the field and the dunes
 reach the silhouette. The tiles are a cache; the field is the truth.
 
-Status: target written, cuts not yet mapped. See [`docs/target.md`](docs/target.md).
+Status: cuts mapped in [`docs/cut-map.md`](docs/cut-map.md), which records what has landed. The target is [`docs/target.md`](docs/target.md).
