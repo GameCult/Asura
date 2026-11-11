@@ -10,9 +10,10 @@ using Vortice.DXGI;
 // See README.md. Exit code 0 only if the pin holds and every flag's errors are inside Tolerance.
 internal static class Tolerance
 {
-    // Justified from measured data in README.md ("Measured results").
-    public static readonly float[] ValueAbs = { 0f, 0f, 0f };
-    public static readonly float[] GradAbs = { 0f, 0f, 0f };
+    // Absolute error bounds per input-magnitude tier (|p| <= 8, <= 128, above): 1.35x the maximum measured on
+    // a GTX 1070 for both fxc flag sets (README.md, "Measured results"). The error scales with ulp(|p|).
+    public static readonly float[] ValueAbs = { 4.2e-6f, 7.2e-5f, 1.65e-3f };
+    public static readonly float[] GradAbs = { 3.3e-5f, 4.2e-4f, 6.8e-3f };
     public const float RelFloor = 0.01f; // relative error = |gpu - ref| / max(|ref|, RelFloor)
 }
 
