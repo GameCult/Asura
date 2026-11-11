@@ -232,6 +232,9 @@ internal static class Program
                 if (gpu.Code3[i] != cs.Code3[i]) m3++;
                 if (gpu.Code2[i] != cs.Code2[i]) m2++;
             }
+            if (Environment.GetEnvironmentVariable("DUMP_WORST") != null)
+                foreach (var w in Enumerable.Range(lo, hi - lo).OrderByDescending(i => Math.Abs(gpu.Value3[i] - cs.Value3[i])).Take(4))
+                    Console.WriteLine($"  worst3 [{w}] p=({pts[4*w]:R},{pts[4*w+1]:R},{pts[4*w+2]:R}) gpu {gpu.Value3[w]:R} cs {cs.Value3[w]:R} codes gpu {gpu.Code3[w]} cs {cs.Code3[w]}");
             Console.WriteLine($"[{set}] snoise(float3)       {s3}\n[{set}] snoise(float2)       {s2}\n[{set}] snoise_grad .w value  {gv}\n[{set}] snoise_grad .xyz      {gg}\n[{set}] branch mismatches: float3 {m3}, float2 {m2}");
             ok &= s3.Over + s2.Over + gv.Over + gg.Over == 0 && s3.Nan + s2.Nan + gv.Nan + gg.Nan == 0 && m3 == 0 && m2 == 0;
         }
