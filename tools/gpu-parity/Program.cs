@@ -34,7 +34,7 @@ internal static class Program
         if (head != pin) { Console.Error.WriteLine("PIN FAILED: CultLib HEAD is not the pinned tag."); return 3; }
 
         var pts = BuildPoints(out int tieCount);
-        Console.WriteLine($"points: {pts.Length} ({tieCount} tie-constructed, {pts.Length - tieCount} seeded random)");
+        Console.WriteLine($"points: {pts.Length / 4} ({tieCount} tie-constructed, {pts.Length / 4 - tieCount} seeded random)");
         var cs = Reference(pts);
 
         string fxc = Environment.GetEnvironmentVariable("FXC")
@@ -185,7 +185,7 @@ internal static class Program
         for (int i = 0; i < n; i++)
         {
             r.Value3[i] = v[4 * i]; r.Value2[i] = v[4 * i + 1];
-            r.Code3[i] = BitConverter.SingleToUInt32Bits(v[4 * i + 2]); r.Code2[i] = BitConverter.SingleToUInt32Bits(v[4 * i + 3]);
+            r.Code3[i] = (uint)v[4 * i + 2]; r.Code2[i] = (uint)v[4 * i + 3];
         }
         foreach (var d in new IDisposable[] { gBuf, gUav, gStage, vBuf, vUav, vStage }) d.Dispose();
         return r;
@@ -194,16 +194,24 @@ internal static class Program
     // ---- compare ----
     sealed class Stat
     {
-        public double MaxAbs, MaxRel; public int Nan; public long Over;
+        public double MaxAbs, MaxRel; public int Nan; public long Over; readonly List<float> errs = new();
         public void Add(float gpu, float refv, float tolAbs)
         {
             if (float.IsNaN(gpu) || float.IsInfinity(gpu)) { Nan++; return; }
             double d = Math.Abs((double)gpu - refv);
+            errs.Add((float)d);
             MaxAbs = Math.Max(MaxAbs, d);
             MaxRel = Math.Max(MaxRel, d / Math.Max(Math.Abs(refv), Tolerance.RelFloor));
             if (d > tolAbs) Over++;
         }
-        public override string ToString() => $"maxAbs {MaxAbs:E3}  maxRel {MaxRel:E3}  NaN/Inf {Nan}  over-tol {Over}";
+        string Pct()
+        {
+            if (errs.Count == 0) return "";
+            errs.Sort();
+            float P(double q) => errs[(int)Math.Min(errs.Count - 1, q * errs.Count)];
+            return $"  p50 {P(.5):E1} p99 {P(.99):E1} p99.9 {P(.999):E1} p99.99 {P(.9999):E1}";
+        }
+        public override string ToString() => $"maxAbs {MaxAbs:E3}  maxRel {MaxRel:E3}  NaN/Inf {Nan}  over-tol {Over}{Pct()}";
     }
 
     static bool Report(string flag, float[] pts, int tieCount, Result cs, Result gpu)

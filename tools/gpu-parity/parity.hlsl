@@ -4,7 +4,7 @@
 
 StructuredBuffer<float4> points : register(t0);          // xyz = 3D point, xy = 2D point
 RWStructuredBuffer<float4> grad_out : register(u0);      // cultmath_snoise_grad: xyz = gradient, w = value
-RWStructuredBuffer<float4> value_out : register(u1);     // x = snoise(float3), y = snoise(float2), z/w = branch codes
+RWStructuredBuffer<float4> value_out : register(u1);     // x = snoise(float3), y = snoise(float2), z/w = branch codes as small floats (denormal bit patterns would flush to zero)
 
 [numthreads(64, 1, 1)]
 void main(uint3 id : SV_DispatchThreadID)
@@ -26,5 +26,5 @@ void main(uint3 id : SV_DispatchThreadID)
     float2 y0 = q - i2 + dot(i2, (0.211324865405187).xx);
     uint code2 = y0.x > y0.y ? 1u : 0u;
 
-    value_out[id.x] = float4(cultmath_snoise(p), cultmath_snoise(q), asfloat(code3), asfloat(code2));
+    value_out[id.x] = float4(cultmath_snoise(p), cultmath_snoise(q), (float)code3, (float)code2);
 }
