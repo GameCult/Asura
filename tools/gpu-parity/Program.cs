@@ -78,7 +78,7 @@ internal static class Program
         }
         foreach (float av in a) Add(av, av, av);
         tieCount = list.Count / 4;
-        var rng = new Random(0x5A5E);
+        var rng = new System.Random(0x5A5E);
         foreach (float scale in new[] { 4f, 64f, 1024f })
             for (int i = 0; i < 40000; i++)
                 Add((float)(rng.NextDouble() * 2 - 1) * scale, (float)(rng.NextDouble() * 2 - 1) * scale, (float)(rng.NextDouble() * 2 - 1) * scale);
@@ -136,26 +136,26 @@ internal static class Program
         var ctx = dev.ImmediateContext;
         using var cs = dev.CreateComputeShader(cso);
 
-        using var inBuf = dev.CreateBuffer(pts, new BufferDescription(n * 16, BindFlags.ShaderResource, ResourceUsage.Default,
+        using var inBuf = dev.CreateBuffer(pts, new BufferDescription((uint)(n * 16), BindFlags.ShaderResource, ResourceUsage.Default,
             CpuAccessFlags.None, ResourceOptionFlags.BufferStructured, 16));
         using var inSrv = dev.CreateShaderResourceView(inBuf, new ShaderResourceViewDescription
         {
             Format = Format.Unknown,
             ViewDimension = ShaderResourceViewDimension.Buffer,
-            Buffer = new BufferShaderResourceView { FirstElement = 0, NumElements = n },
+            Buffer = new BufferShaderResourceView { FirstElement = 0, NumElements = (uint)n },
         });
 
         (ID3D11Buffer buf, ID3D11UnorderedAccessView uav, ID3D11Buffer staging) Out()
         {
-            var b = dev.CreateBuffer(new BufferDescription(n * 16, BindFlags.UnorderedAccess, ResourceUsage.Default,
+            var b = dev.CreateBuffer(new BufferDescription((uint)(n * 16), BindFlags.UnorderedAccess, ResourceUsage.Default,
                 CpuAccessFlags.None, ResourceOptionFlags.BufferStructured, 16));
             var u = dev.CreateUnorderedAccessView(b, new UnorderedAccessViewDescription
             {
                 Format = Format.Unknown,
                 ViewDimension = UnorderedAccessViewDimension.Buffer,
-                Buffer = new BufferUnorderedAccessView { FirstElement = 0, NumElements = n },
+                Buffer = new BufferUnorderedAccessView { FirstElement = 0, NumElements = (uint)n },
             });
-            var s = dev.CreateBuffer(new BufferDescription(n * 16, BindFlags.None, ResourceUsage.Staging,
+            var s = dev.CreateBuffer(new BufferDescription((uint)(n * 16), BindFlags.None, ResourceUsage.Staging,
                 CpuAccessFlags.Read, ResourceOptionFlags.None, 0));
             return (b, u, s);
         }
