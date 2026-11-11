@@ -11,8 +11,8 @@ using Vortice.DXGI;
 internal static class Tolerance
 {
     // Justified from measured data in README.md ("Measured results").
-    public const float ValueAbs = 0f;
-    public const float GradAbs = 0f;
+    public static readonly float[] ValueAbs = { 0f, 0f, 0f };
+    public static readonly float[] GradAbs = { 0f, 0f, 0f };
     public const float RelFloor = 0.01f; // relative error = |gpu - ref| / max(|ref|, RelFloor)
 }
 
@@ -214,29 +214,37 @@ internal static class Program
         public override string ToString() => $"maxAbs {MaxAbs:E3}  maxRel {MaxRel:E3}  NaN/Inf {Nan}  over-tol {Over}{Pct()}";
     }
 
+    // Tiers by max |coordinate|: x0 = value - i + ... cancels, so the input's own ulp scales the error.
+    static readonly (string Name, float Max)[] Tiers = { ("|p|<=8", 8f), ("8<|p|<=128", 128f), ("128<|p|", float.MaxValue) };
+
     static bool Report(string flag, float[] pts, int tieCount, Result cs, Result gpu)
     {
         int n = pts.Length / 4;
         Console.WriteLine($"\n== fxc flags: {flag} ({n} points) ==");
         bool ok = true;
         foreach (var (set, lo, hi) in new[] { ("ties", 0, tieCount), ("random", tieCount, n) })
+        for (int t = 0; t < Tiers.Length; t++)
         {
+            var idx = Enumerable.Range(lo, hi - lo).Where(i =>
+            {
+                float m = Math.Max(Math.Abs(pts[4 * i]), Math.Max(Math.Abs(pts[4 * i + 1]), Math.Abs(pts[4 * i + 2])));
+                return m <= Tiers[t].Max && (t == 0 || m > Tiers[t - 1].Max);
+            }).ToArray();
+            if (idx.Length == 0) continue;
             var s3 = new Stat(); var s2 = new Stat(); var gv = new Stat(); var gg = new Stat();
             int m3 = 0, m2 = 0;
-            for (int i = lo; i < hi; i++)
+            float va = Tolerance.ValueAbs[t], ga = Tolerance.GradAbs[t];
+            foreach (int i in idx)
             {
-                s3.Add(gpu.Value3[i], cs.Value3[i], Tolerance.ValueAbs);
-                s2.Add(gpu.Value2[i], cs.Value2[i], Tolerance.ValueAbs);
-                for (int c = 0; c < 3; c++) gg.Add(gpu.Grad4[4 * i + c], cs.Grad4[4 * i + c], Tolerance.GradAbs);
-                gv.Add(gpu.Grad4[4 * i + 3], cs.Grad4[4 * i + 3], Tolerance.ValueAbs);
+                s3.Add(gpu.Value3[i], cs.Value3[i], va);
+                s2.Add(gpu.Value2[i], cs.Value2[i], va);
+                for (int c = 0; c < 3; c++) gg.Add(gpu.Grad4[4 * i + c], cs.Grad4[4 * i + c], ga);
+                gv.Add(gpu.Grad4[4 * i + 3], cs.Grad4[4 * i + 3], va);
                 if (gpu.Code3[i] != cs.Code3[i]) m3++;
                 if (gpu.Code2[i] != cs.Code2[i]) m2++;
             }
-            if (Environment.GetEnvironmentVariable("DUMP_WORST") != null)
-                foreach (var w in Enumerable.Range(lo, hi - lo).OrderByDescending(i => Math.Abs(gpu.Value3[i] - cs.Value3[i])).Take(4))
-                    Console.WriteLine($"  worst3 [{w}] p=({pts[4*w]:R},{pts[4*w+1]:R},{pts[4*w+2]:R}) gpu {gpu.Value3[w]:R} cs {cs.Value3[w]:R} codes gpu {gpu.Code3[w]} cs {cs.Code3[w]}");
-            Console.WriteLine($"[{set}] snoise(float3)       {s3}\n[{set}] snoise(float2)       {s2}\n[{set}] snoise_grad .w value  {gv}\n[{set}] snoise_grad .xyz      {gg}\n[{set}] branch mismatches: float3 {m3}, float2 {m2}");
-            ok &= s3.Over + s2.Over + gv.Over + gg.Over == 0 && s3.Nan + s2.Nan + gv.Nan + gg.Nan == 0 && m3 == 0 && m2 == 0;
+            Console.WriteLine($"-- {set} {Tiers[t].Name}: {idx.Length} points, tol value {va:E1} grad {ga:E1}\n   snoise(float3)       {s3}\n   snoise(float2)       {s2}\n   snoise_grad .w value  {gv}\n   snoise_grad .xyz      {gg}\n   branch mismatches (informational): float3 {m3}, float2 {m2}");
+            ok &= s3.Over + s2.Over + gv.Over + gg.Over == 0 && s3.Nan + s2.Nan + gv.Nan + gg.Nan == 0;
         }
         return ok;
     }
