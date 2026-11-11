@@ -32,7 +32,9 @@ internal static class Program
         string head = Git(cultlib, "rev-parse HEAD");
         string pin = Git(cultlib, $"rev-parse {PinTag}^{{commit}}");
         Console.WriteLine($"CultLib {cultlib}\n  HEAD {head}\n  {PinTag} {pin}");
-        if (head != pin) { Console.Error.WriteLine("PIN FAILED: CultLib HEAD is not the pinned tag."); return 3; }
+        string dirty = Git(cultlib, "status --porcelain -- packages/cultmath");
+        if (head.Length == 0 || head != pin || dirty.Length != 0)
+        { Console.Error.WriteLine("PIN FAILED: CultLib HEAD is not the pinned tag, or packages/cultmath is modified."); return 3; }
 
         var pts = BuildPoints(out int tieCount);
         Console.WriteLine($"points: {pts.Length / 4} ({tieCount} tie-constructed, {pts.Length / 4 - tieCount} seeded random)");

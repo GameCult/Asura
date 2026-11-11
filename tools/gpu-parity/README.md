@@ -18,9 +18,9 @@ dotnet run -c Release --project tools/gpu-parity/GpuParity.csproj
 ```
 
 It compiles the kernel twice (default flags, where FMA contraction is allowed, and `/Gis` IEEE strict),
-dispatches once per flag (about 130k threads), and prints max abs / max relative error per function,
+dispatches once per flag (about 164k threads), and prints max abs / max relative error per function,
 split into tie-constructed points and a seeded random sweep. Exit code 0 means within `Tolerance`
-(in `Program.cs`) and no branch mismatches.
+(in `Program.cs`). Branch mismatches are reported, not failed.
 
 Points: dyadic coordinates on the simplex tie planes (`x0.x == x0.y`, `y == z`, `x == z`, offsets
 k in -2..2) with 0, 1 and 2 ulp neighbours, plus 3 x 40000 seeded uniform points at scales 4, 64, 1024.
@@ -55,7 +55,7 @@ the first steps differently), not with the noise: 16x more input magnitude gave 
 the first two tiers. Single GPU and driver; a different driver may need the bounds re-measured.
 
 Tie handling: under both flag sets the GPU took a different simplex ordering branch than C# at
-190 of 35814 tie points (float3) and 39 (float2) with |p| <= 8, 2 and 4 in the middle tier, 0 above
+190 of 35814 tie points (float3) and 39 (float2) with |p| <= 8, 2 and 4 in the middle tier, 0 above among tie points (the random sweep above 128 had 1 float3 mismatch)
 (the same counts under `/Gis`, so it is not FMA contraction; the probe is a separate expression tree,
 so it is evidence of a GPU/CPU rounding difference in x0, not of the noise body's own path). Every one of
 those points is inside the value and gradient tolerance: the noise is continuous across the tie, so a
